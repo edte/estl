@@ -72,6 +72,15 @@ func TestQuickSort(t *testing.T) {
 	fmt.Println(IsSorted(v.Begin(), v.End()))
 }
 
+func TestHeapSort(t *testing.T) {
+	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1, 134, 22, -234, -3, 34, 5, 1, 623, -234, 555, 3, 7, -2}))
+	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
+	// v := vector.New(vector.WithData([]interface{}{3, 2, 3, -1, 3, 1, 1}))
+	heapSort(v.Begin(), v.End())
+	fmt.Println(v)
+	fmt.Println(IsSorted(v.Begin(), v.End()))
+}
+
 func TestName(t *testing.T) {
 	v := get()
 	// fmt.Println(v)
@@ -138,7 +147,7 @@ func TestSortUser(t *testing.T) {
 
 func get() *vector.Vector {
 	v := vector.New()
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 1e4; i++ {
 		v.PushBack(rand.Int() % 100)
 		// v.PushBack(i)
 	}
@@ -208,6 +217,16 @@ func BenchmarkQuickSort(b *testing.B) {
 	}
 }
 
+func BenchmarkHeapSort(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		v := get()
+		b.StartTimer()
+		heapSort(v.Begin(), v.End())
+		fmt.Println(IsSorted(v.Begin(), v.End()))
+	}
+}
+
 func BenchmarkSort(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
@@ -229,4 +248,10 @@ func TestIsSortedUntil(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{1, 3, 6, 2, 1, 5, 2, 3}))
 	d := IsSortedUntil(v.Begin(), v.End())
 	fmt.Println(d.Value())
+}
+
+func TestGetDepth(t *testing.T) {
+	v := vector.New(vector.WithCapInit(1e9, 1))
+	depth := getDepth(v.Begin(), v.End())
+	fmt.Println(depth)
 }

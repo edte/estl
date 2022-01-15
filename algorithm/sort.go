@@ -420,12 +420,8 @@ func getDepth(first, last iterator.RandomAccessIterator) int {
 
 // 堆排序
 func heapSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-	fmt.Println(c)
-
+	MakeHeap(first, last, cmp...)
+	SortHeap(first, last, cmp...)
 }
 
 // 计数排序
