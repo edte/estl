@@ -17,7 +17,7 @@ func TestNew(t *testing.T) {
 	v.PushBack(5)
 	v.PushBack(6)
 
-	for b := v.CBegin(); !b.Equal(v.CEnd()); b.Pre() {
+	for b := v.Begin(); !b.Equal(v.End()); b.Pre() {
 		fmt.Println(b.Value())
 	}
 }

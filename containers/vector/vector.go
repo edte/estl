@@ -10,6 +10,7 @@ import (
 
 	"stl/comparator"
 	"stl/iterator"
+	"stl/locker"
 )
 
 // *Vector
@@ -45,18 +46,23 @@ type Option func(*Vector)
 
 type Vector struct {
 	data []interface{}
-	cmp  comparator.Comparator
+
+	cmp    comparator.Comparator
+	locker locker.Locker
 }
 
 // New Construct
 func New(opts ...Option) *Vector {
 	v := &Vector{
-		data: make([]interface{}, 0, 0),
-		cmp:  &comparator.Less{},
+		data:   make([]interface{}, 0, 0),
+		cmp:    comparator.NewLess(),
+		locker: locker.NewRWLock(),
 	}
+
 	for _, opt := range opts {
 		opt(v)
 	}
+
 	return v
 }
 
@@ -80,13 +86,13 @@ func WithData(data []interface{}) Option {
 
 func WithCap(c int) Option {
 	return func(v *Vector) {
-		v.data = make([]interface{}, 0, c)
+		v.data = make([]interface{}, c, c)
 	}
 }
 
-func WithCapInit(c int, value int) Option {
+func WithCapInit(c int, value interface{}) Option {
 	return func(v *Vector) {
-		v.data = make([]interface{}, 0, c)
+		v.data = make([]interface{}, c, c)
 		for i := range v.data {
 			v.data[i] = value
 		}
@@ -105,8 +111,24 @@ func WithCmp(cmp func(a interface{}, b interface{}) bool) Option {
 	}
 }
 
+func WithIter(first, last iterator.RandomAccessIterator) Option {
+	return func(v *Vector) {
+		v.InsertIter(v.Begin(), first, last)
+	}
+}
+
+func WithGoroutineSafe(l locker.Locker) Option {
+	return func(v *Vector) {
+		v.locker = l
+	}
+}
+
 func (v *Vector) iterAt(pos int) iterator.RandomAccessIterator {
 	return NewIterator(v, pos)
+}
+
+func (v *Vector) constIterAt(pos int) iterator.InputIterator {
+	return NewInputIterator(v, pos)
 }
 
 // Begin Return iterator to beginning
@@ -122,34 +144,34 @@ func (v *Vector) End() iterator.RandomAccessIterator {
 	return v.iterAt(v.Size())
 }
 
-// CBegin Return reverse iterator to reverse beginning
-func (v *Vector) CBegin() iterator.RandomAccessIterator {
+// RBegin Return reverse iterator to reverse beginning
+func (v *Vector) RBegin() iterator.RandomAccessIterator {
 	return v.iterAt(v.Size() - 1)
 }
 
-// CEnd Return reverse iterator to reverse end
-func (v *Vector) CEnd() iterator.RandomAccessIterator {
+// REnd Return reverse iterator to reverse end
+func (v *Vector) REnd() iterator.RandomAccessIterator {
 	return v.iterAt(-1)
 }
 
-// CRbegin Return const_iterator to beginning
-func (v *Vector) CRbegin() iterator.InputIterator {
-	panic("implement me")
+// CBegin Return const_iterator to beginning
+func (v *Vector) CBegin() iterator.InputIterator {
+	return v.constIterAt(0)
 }
 
-// CRend Return const_iterator to end
-func (v *Vector) CRend() iterator.InputIterator {
-	panic("implement me")
+// Cend Return const_iterator to end
+func (v *Vector) CEnd() iterator.InputIterator {
+	return v.constIterAt(v.Size())
 }
 
-// Rbegin Return const_reverse_iterator to reverse beginning
-func (v *Vector) Rbegin() iterator.RandomAccessIterator {
-	panic("implement me")
+// CRBegin Return const_reverse_iterator to reverse beginning
+func (v *Vector) CRBegin() iterator.InputIterator {
+	return v.constIterAt(v.Size() - 1)
 }
 
-// Rend Return const_reverse_iterator to reverse end
-func (v *Vector) Rend() iterator.RandomAccessIterator {
-	panic("implement me")
+// CREnd Return const_reverse_iterator to reverse end
+func (v *Vector) CREnd() iterator.InputIterator {
+	return v.constIterAt(-1)
 }
 
 // Size Return Size()
