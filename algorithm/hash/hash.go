@@ -5,9 +5,11 @@
 // @description:
 package hash
 
+// 实现一些 hash 函数
+
 type Hash func(data []byte, seed uint64) uint64
 
-//const SEED = 0x1234ABCD
+// const SEED = 0x1234ABCD
 func MurmurHash64(data []byte, SEED uint64) (h uint64) {
 	const BigM = 0xc6a4a7935bd1e995
 	const BigR = 47
@@ -59,7 +61,7 @@ func MurmurHash64(data []byte, SEED uint64) (h uint64) {
 	return
 }
 
-//https://www.ghsi.de/pages/subpages/Online%20CRC%20Calculation/
+// https://www.ghsi.de/pages/subpages/Online%20CRC%20Calculation/
 // 名称	 生成多项式	 简记式 *	 应用举例
 // CRC-4	 x4+x+1		 ITU G.704
 // CRC-12	 x12+x11+x3+x+1
@@ -84,7 +86,7 @@ func BKDRHash(str []byte) uint32 {
 
 // BKDR Hash Function 64
 func BKDRHash64(str []byte, seed uint64) uint64 {
-	//var seed uint64 = 131 // 31 131 1313 13131 131313 etc..
+	// var seed uint64 = 131 // 31 131 1313 13131 131313 etc..
 	var hash uint64 = 0
 	for i := 0; i < len(str); i++ {
 		hash = hash*seed + uint64(str[i])
