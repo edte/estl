@@ -6,6 +6,8 @@
 package vector
 
 import (
+	"fmt"
+
 	"stl/iterator"
 )
 
@@ -15,10 +17,10 @@ type InputIterator struct {
 }
 
 func NewInputIterator(data *Vector, pos int) *InputIterator {
-	return &InputIterator{data: data.Clone(), pos: pos}
+	return &InputIterator{data: data, pos: pos}
 }
 
-func (iter InputIterator) Next() iterator.InputIterator {
+func (iter *InputIterator) Next() iterator.InputIterator {
 	if iter.pos == iter.data.Size() {
 		return iter
 	}
@@ -26,15 +28,15 @@ func (iter InputIterator) Next() iterator.InputIterator {
 	return iter
 }
 
-func (iter InputIterator) Clone() iterator.InputIterator {
+func (iter *InputIterator) Clone() iterator.InputIterator {
 	return NewInputIterator(iter.data, iter.pos)
 }
 
-func (iter InputIterator) HasNext() bool {
+func (iter *InputIterator) HasNext() bool {
 	return iter.pos == iter.data.Size()
 }
 
-func (iter InputIterator) Equal(other iterator.InputIterator) bool {
+func (iter *InputIterator) Equal(other iterator.InputIterator) bool {
 	i, ok := other.(*InputIterator)
 	if !ok {
 		return false
@@ -42,10 +44,14 @@ func (iter InputIterator) Equal(other iterator.InputIterator) bool {
 	return i.data == iter.data && i.pos == iter.pos
 }
 
-func (iter InputIterator) IsValid() bool {
+func (iter *InputIterator) IsValid() bool {
 	return iter.pos >= -1 && iter.pos <= iter.data.Size()
 }
 
-func (iter InputIterator) Value() interface{} {
+func (iter *InputIterator) Value() interface{} {
 	return iter.data.At(iter.pos)
+}
+
+func (iter *InputIterator) String() string {
+	return fmt.Sprint(iter.data.At(iter.pos))
 }
