@@ -7,6 +7,7 @@ package algorithm
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"sort"
 	"testing"
@@ -18,50 +19,50 @@ import (
 func TestSelectSort(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1}))
 	selectSort(v.Begin(), v.End())
-	fmt.Println(v)
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestBubbleSort(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1}))
 	// v := vector.New(vector.WithData([]interface{}{-1, 1, 2, 3, 3, 5, 6, 9, 99}))
 	bubbleSort(v.Begin(), v.End())
-	fmt.Println(v)
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestInsertSort(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1}))
 	insertSort(v.Begin(), v.End())
-	fmt.Println(v)
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestSellSort(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1}))
 	shellSort(v.Begin(), v.End())
-	fmt.Println(v)
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestMergeSort(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1}))
 	mergeSort(v.Begin(), v.End())
-	fmt.Println(v)
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestSleepSort(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 3}))
-	sleepSort(v.Begin(), v.End())
-	fmt.Println(v)
+	//sleepSort(v.Begin(), v.End())
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestBogoSort(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1}))
 	bogoSort(v.Begin(), v.End())
-	fmt.Println(v)
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestCocktailSort(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1}))
 	cocktailSort(v.Begin(), v.End())
-	fmt.Println(v)
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestQuickSort(t *testing.T) {
@@ -69,8 +70,7 @@ func TestQuickSort(t *testing.T) {
 	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
 	// v := vector.New(vector.WithData([]interface{}{3, 2, 3, -1, 3, 1, 1}))
 	quickSort(v.Begin(), v.End(), 9999999)
-	fmt.Println(v)
-	fmt.Println(IsSorted(v.Begin(), v.End()))
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestHeapSort(t *testing.T) {
@@ -78,8 +78,7 @@ func TestHeapSort(t *testing.T) {
 	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
 	// v := vector.New(vector.WithData([]interface{}{3, 2, 3, -1, 3, 1, 1}))
 	heapSort(v.Begin(), v.End())
-	fmt.Println(v)
-	fmt.Println(IsSorted(v.Begin(), v.End()))
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestCountSort(t *testing.T) {
@@ -87,8 +86,7 @@ func TestCountSort(t *testing.T) {
 	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
 	// v := vector.New(vector.WithData([]interface{}{3, 2, 4, 1, 1}))
 	countSort(v.Begin(), v.End(), comparator.NewLess())
-	fmt.Println(v)
-	fmt.Println(IsSorted(v.Begin(), v.End()))
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestBucketSort(t *testing.T) {
@@ -96,8 +94,7 @@ func TestBucketSort(t *testing.T) {
 	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
 	// v := vector.New(vector.WithData([]interface{}{13, 2, 14, 1, 1}))
 	bucketSort(v.Begin(), v.End(), comparator.NewLess())
-	fmt.Println(v)
-	fmt.Println(IsSorted(v.Begin(), v.End()))
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestRadioSort(t *testing.T) {
@@ -105,8 +102,7 @@ func TestRadioSort(t *testing.T) {
 	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
 	// v := vector.New(vector.WithData([]interface{}{23, 22, 14, 13, 1, 6, 0}))
 	radioSort(v.Begin(), v.End(), comparator.NewLess())
-	fmt.Println(v)
-	fmt.Println(IsSorted(v.Begin(), v.End()))
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestName(t *testing.T) {
@@ -115,13 +111,13 @@ func TestName(t *testing.T) {
 	// fmt.Println()
 	quickSort(v.Begin(), v.End(), 9999999)
 	// fmt.Println(v)
-	fmt.Println(IsSorted(v.Begin(), v.End()))
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestSortCmp(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1}))
 	selectSort(v.Begin(), v.End(), comparator.NewGreater())
-	fmt.Println(v)
+	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
 func TestSortUser(t *testing.T) {
@@ -175,7 +171,7 @@ func TestSortUser(t *testing.T) {
 
 func get() *vector.Vector {
 	v := vector.New()
-	for i := 0; i < 1e4; i++ {
+	for i := 0; i < 1e2; i++ {
 		v.PushBack(rand.Int() % 100)
 		// v.PushBack(i)
 	}

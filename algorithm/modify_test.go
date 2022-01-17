@@ -7,6 +7,7 @@ package algorithm
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"stl/containers/vector"
@@ -23,13 +24,19 @@ func TestSwap(t *testing.T) {
 	fmt.Println(v)
 }
 
-func TestCopy(t *testing.T) {
-
+func TestFill(t *testing.T) {
+	v := vector.New(vector.WithCap(10))
+	Fill(v.Begin(), v.End(), 10)
+	assert.Equal(t, "10 10 10 10 10 10 10 10 10 10 ", v.String())
+	fmt.Println(v)
 }
 
-func TestFill(t *testing.T) {
-	//v := vector.New(vector.WithCap(10))
-	//Fill(v.Begin(), v.End(), 10)
+func TestFillN(t *testing.T) {
+	v := vector.New(vector.WithCap(6))
+	FillN(v.Begin(), 3, 0)
+	FillN(NextN(v.Begin(), 3), 3, 1)
+	assert.Equal(t, "0 0 0 1 1 1 ", v.String())
+	fmt.Println(v)
 }
 
 func TestShuffle(t *testing.T) {

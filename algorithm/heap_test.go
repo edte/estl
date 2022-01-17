@@ -75,19 +75,19 @@ func TestIsHeapUntil(t *testing.T) {
 
 func TestGetParent(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{"j", "a", "b", "c", "d", "e", "f", "g", "h", "i"}))
-	parent := getParent(v.Begin().Next(), v.Begin().Clone().NextN(4))
+	parent := getParent(Next(v.Begin()), NextN(v.Begin(), 4))
 	fmt.Println(parent.Value())
 }
 
 func TestLeftChild(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{"j", "a", "b", "c", "d", "e", "f", "g", "h", "i"}))
-	parent := getLeftChild(v.Begin().Next(), v.Begin().Clone().NextN(4))
+	parent := getLeftChild(Next(v.Begin()), NextN(v.Begin(), 4))
 	fmt.Println(parent.Value())
 }
 
 func TestRightChild(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{"j", "a", "b", "c", "d", "e", "f", "g", "h", "i"}))
-	parent := getRightChild(v.Begin().Next(), v.Begin().Clone().NextN(4))
+	parent := getRightChild(Next(v.Begin()), NextN(v.Begin(), 4))
 	fmt.Println(parent.Value())
 }
 
@@ -116,7 +116,7 @@ func TestUp(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{1, 2, 3, 4, 5, 6, 7, 0}))
 	fmt.Println(ShowHeap(v.Begin(), v.End()))
 
-	siftUp(v.Begin(), v.End().Pre(), comparator.NewGreater())
+	siftUp(v.Begin(), Pre(v.End()), comparator.NewGreater())
 
 	fmt.Println()
 	fmt.Println()

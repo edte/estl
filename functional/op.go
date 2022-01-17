@@ -5,9 +5,13 @@
 // @description:
 package functional
 
+import "stl/iterator"
+
 type Op func(val interface{})
 
 type BinaryOp func(x, y int) int
+
+type IterOp func(i iterator.ForwardIterator)
 
 // Pred UnaryPredicate
 type Pred func(i interface{}) bool

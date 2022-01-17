@@ -14,13 +14,13 @@ import (
 
 func TestCount(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{23, 2, 3, 3, 3, 3, 2, 2}))
-	count := Count(v.CBegin(), v.CEnd(), 2)
+	count := Count(v.Begin(), v.End(), 2)
 	fmt.Println(count)
 }
 
 func TestCountIf(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{23, 2, 3, 3, 3, 3, 2, 2}))
-	res := CountIf(v.CBegin(), v.CEnd(), func(i interface{}) bool {
+	res := CountIf(v.Begin(), v.End(), func(i interface{}) bool {
 		return i.(int)%2 == 0
 	})
 

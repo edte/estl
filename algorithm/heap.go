@@ -20,7 +20,7 @@ func PushHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 	if len(cmp) != 0 {
 		c = cmp[0]
 	}
-	siftUp(first, last.Clone().Pre(), c)
+	siftUp(first, last.Clone().(iterator.RandomAccessIterator).Pre().(iterator.RandomAccessIterator), c)
 }
 
 // 上浮第 i 个元素
@@ -59,7 +59,7 @@ func siftDown(first, last, i iterator.RandomAccessIterator, c comparator.Compara
 		// 如果右子节点存在，那么
 		r := getRightChild(first, i)
 		if r.Position() < last.Position() {
-			tmp = BestElement(l, r.Clone().Next(), comparator.Reserve(c))
+			tmp = BestElement(l, r.Clone().(iterator.RandomAccessIterator).Next().(iterator.RandomAccessIterator), comparator.Reserve(c))
 		}
 
 		if c.Operator(i.Value(), tmp.Value()) {
@@ -76,7 +76,7 @@ func getParent(first, i iterator.RandomAccessIterator) iterator.RandomAccessIter
 	n := first.Position()
 	j := i.Position() - n
 	index := (j-1)/2 + n
-	return i.Clone().IteratorAt(index)
+	return i.Clone().(iterator.RandomAccessIterator).IteratorAt(index)
 }
 
 // 首节点坐标为 n
@@ -86,7 +86,7 @@ func getLeftChild(first, i iterator.RandomAccessIterator) iterator.RandomAccessI
 	n := first.Position()
 	j := i.Position() - n
 	index := 2*j + 1 + n
-	return i.Clone().IteratorAt(index)
+	return i.Clone().(iterator.RandomAccessIterator).IteratorAt(index)
 }
 
 // 首节点坐标为 n
@@ -96,7 +96,7 @@ func getRightChild(first, i iterator.RandomAccessIterator) iterator.RandomAccess
 	n := first.Position()
 	j := i.Position() - n
 	index := 2*j + 2 + n
-	return i.Clone().IteratorAt(index)
+	return i.Clone().(iterator.RandomAccessIterator).IteratorAt(index)
 }
 
 // 获取最后一个非叶子节点
@@ -108,7 +108,7 @@ func getLastNotLeaf(first, last iterator.RandomAccessIterator) iterator.RandomAc
 	m := first.Distance(last)
 	n := first.Position()
 	index := n + m/2 - 1
-	return first.Clone().IteratorAt(index)
+	return first.Clone().(iterator.RandomAccessIterator).IteratorAt(index)
 }
 
 // 获取第一个叶子节点
@@ -116,7 +116,7 @@ func getFirstLeaf(first, last iterator.RandomAccessIterator) iterator.RandomAcce
 	m := first.Distance(last)
 	n := first.Position()
 	index := n + m/2
-	return first.Clone().IteratorAt(index)
+	return first.Clone().(iterator.RandomAccessIterator).IteratorAt(index)
 }
 
 // PopHeap pop element from heap range
@@ -126,8 +126,8 @@ func PopHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Compar
 		c = cmp[0]
 	}
 
-	Swap(first, last.Clone().Pre())
-	siftDown(first, last.Clone().Pre(), first, c)
+	Swap(first, last.Clone().(iterator.RandomAccessIterator).Pre())
+	siftDown(first, last.Clone().(iterator.RandomAccessIterator).Pre().(iterator.RandomAccessIterator), first, c)
 }
 
 // MakeHeap make heap from range
@@ -155,7 +155,7 @@ func SortHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 		c = cmp[0]
 	}
 
-	i := last.Clone().Pre()
+	i := Pre(last)
 
 	for !i.Equal(first) {
 		Swap(first, i)
@@ -318,7 +318,7 @@ func ShowHeap(first, last iterator.RandomAccessIterator) string {
 func getLevel(first, last iterator.RandomAccessIterator) int {
 	f := getFirstLeaf(first, last)
 	level := 1
-	i := first.Clone()
+	i := Clone(first)
 
 	for {
 		if !i.IsFront(f) {

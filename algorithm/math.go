@@ -28,10 +28,10 @@ func MaxMin(data ...interface{}) (interface{}, interface{}) {
 
 // BestElement 取最值
 func BestElement(first, last iterator.RandomAccessIterator, cmp comparator.Comparator) (res iterator.RandomAccessIterator) {
-	res = first.Clone()
-	for l := first.Clone(); !l.Equal(last); l.Next() {
+	res = Clone(first)
+	for l := Clone(first); !l.Equal(last); l.Next() {
 		if cmp.Operator(l.Value(), res.Value()) {
-			res = l.Clone()
+			res = Clone(l)
 		}
 	}
 	return res
@@ -72,7 +72,7 @@ func Accumulate(first, last iterator.RandomAccessIterator, ops ...functional.Bin
 
 	res := 0
 
-	for i := first.Clone(); !i.Equal(last); i.Next() {
+	for i := Clone(first); !i.Equal(last); i.Next() {
 		res = op(res, i.Value().(int))
 	}
 
@@ -88,12 +88,12 @@ func AdjacentDifference(first, last iterator.InputIterator, result iterator.Outp
 	if len(ops) != 0 {
 		op = ops[0]
 	}
-	r := result.Clone()
+	r := CloneOutput(result)
 	r.SetValue(first.Value())
 
-	for i := first.Clone(); !i.Clone().Next().Equal(last); i.Next() {
+	for i := CloneInput(first); !CloneInput(i).Next().Equal(last); i.Next() {
 		r.Next()
-		r.SetValue(op(i.Clone().Next().Value().(int), i.Value().(int)))
+		r.SetValue(op(CloneInput(i).Next().(iterator.InputIterator).Value().(int), i.Value().(int)))
 	}
 
 	return result
@@ -112,8 +112,8 @@ func InnerProduct(first1, last1, first2 iterator.InputIterator, init int, ops ..
 		op2 = ops[1]
 	}
 
-	j := first2.Clone()
-	for i := first1.Clone(); !i.Equal(last1); i.Next() {
+	j := first2.Clone().(iterator.InputIterator)
+	for i := first1.Clone().(iterator.InputIterator); !i.Equal(last1); i.Next() {
 		init = op1(init, op2(i.Value().(int), j.Value().(int)))
 		j.Next()
 	}
@@ -132,11 +132,11 @@ func PartialSum(first, last iterator.InputIterator, result iterator.OutputIterat
 	}
 
 	result.SetValue(first.Value())
-	j := result.Clone()
+	j := result.Clone().(iterator.OutputIterator)
 
 	t := first.Value().(int)
 
-	for i := first.Clone().Next(); !i.Equal(last); i.Next() {
+	for i := first.Clone().Next().(iterator.InputIterator); !i.Equal(last); i.Next() {
 		j.Next()
 		t = op(t, i.Value().(int))
 		j.SetValue(t)
@@ -150,7 +150,7 @@ func PartialSum(first, last iterator.InputIterator, result iterator.OutputIterat
 // successive values of val, as if incremented with ++val
 // after each element is written.
 func Itoa(first, last iterator.RandomAccessIterator, val int) {
-	for i := first.Clone(); !i.Equal(last); i.Next() {
+	for i := first.Clone().(iterator.RandomAccessIterator); !i.Equal(last); i.Next() {
 		i.SetValue(val)
 		val++
 	}

@@ -91,20 +91,20 @@ func TestAccumulate(t *testing.T) {
 func TestAdjacentDifference(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{1, 2, 3, 4}))
 	res := vector.New(vector.WithCapInit(4, 0))
-	AdjacentDifference(v.CBegin(), v.CEnd(), res.OBegin())
+	AdjacentDifference(v.Begin(), v.End(), res.Begin())
 	fmt.Println(res)
 }
 
 func TestInnerProduct(t *testing.T) {
 	v1 := vector.New(vector.WithData([]interface{}{10, 20, 30}))
 	v2 := vector.New(vector.WithData([]interface{}{1, 2, 3}))
-	fmt.Println(InnerProduct(v1.CBegin(), v1.CEnd(), v2.CBegin(), 100))
+	fmt.Println(InnerProduct(v1.Begin(), v1.End(), v2.Begin(), 100))
 }
 
 func TestPartialSum(t *testing.T) {
 	v1 := vector.New(vector.WithData([]interface{}{1, 2, 3, 4}))
 	res := vector.New(vector.WithCapInit(4, 0))
-	PartialSum(v1.CBegin(), v1.CEnd(), res.OBegin())
+	PartialSum(v1.Begin(), v1.End(), res.Begin())
 	fmt.Println(res)
 }
 

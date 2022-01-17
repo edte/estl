@@ -12,9 +12,6 @@ import (
 )
 
 type Iterator struct {
-	InputIterator
-	OutputIterator
-	ForwardIterator
 	data *Vector
 	pos  int
 }
@@ -23,7 +20,7 @@ func NewIterator(data *Vector, pos int) *Iterator {
 	return &Iterator{data: data, pos: pos}
 }
 
-func (iter *Iterator) Next() iterator.RandomAccessIterator {
+func (iter *Iterator) Next() iterator.Iterator {
 	if iter.pos == iter.data.Size() {
 		return iter
 	}
@@ -39,7 +36,7 @@ func (iter *Iterator) NextN(n int) iterator.RandomAccessIterator {
 	return iter
 }
 
-func (iter *Iterator) Pre() iterator.RandomAccessIterator {
+func (iter *Iterator) Pre() iterator.BidirectionalIterator {
 	if iter.pos == -1 {
 		return iter
 	}
@@ -66,11 +63,11 @@ func (iter *Iterator) IteratorAt(pos int) iterator.RandomAccessIterator {
 	return iter
 }
 
-func (iter *Iterator) Clone() iterator.RandomAccessIterator {
+func (iter *Iterator) Clone() iterator.Iterator {
 	return NewIterator(iter.data, iter.pos)
 }
 
-func (iter *Iterator) Equal(other iterator.RandomAccessIterator) bool {
+func (iter *Iterator) Equal(other iterator.Iterator) bool {
 	i, ok := other.(*Iterator)
 	if !ok {
 		return false
@@ -78,7 +75,7 @@ func (iter *Iterator) Equal(other iterator.RandomAccessIterator) bool {
 	return i.data == iter.data && i.pos == iter.pos
 }
 
-func (iter *Iterator) IsFront(other iterator.RandomAccessIterator) bool {
+func (iter *Iterator) IsFront(other iterator.BidirectionalIterator) bool {
 	i, ok := other.(*Iterator)
 	if !ok {
 		return false
@@ -86,7 +83,15 @@ func (iter *Iterator) IsFront(other iterator.RandomAccessIterator) bool {
 	return i.data == iter.data && i.pos > iter.pos
 }
 
-func (iter *Iterator) IsBack(other iterator.RandomAccessIterator) bool {
+func (iter *Iterator) IsFrontEqual(other iterator.BidirectionalIterator) bool {
+	i, ok := other.(*Iterator)
+	if !ok {
+		return false
+	}
+	return i.data == iter.data && i.pos >= iter.pos
+}
+
+func (iter *Iterator) IsBack(other iterator.BidirectionalIterator) bool {
 	i, ok := other.(*Iterator)
 	if !ok {
 		return false
@@ -95,15 +100,7 @@ func (iter *Iterator) IsBack(other iterator.RandomAccessIterator) bool {
 
 }
 
-func (iter *Iterator) IsFrontEqual(other iterator.RandomAccessIterator) bool {
-	i, ok := other.(*Iterator)
-	if !ok {
-		return false
-	}
-	return i.data == iter.data && i.pos >= iter.pos
-}
-
-func (iter *Iterator) IsBackEqual(other iterator.RandomAccessIterator) bool {
+func (iter *Iterator) IsBackEqual(other iterator.BidirectionalIterator) bool {
 	i, ok := other.(*Iterator)
 	if !ok {
 		return false

@@ -6,8 +6,6 @@
 package algorithm
 
 import (
-	"reflect"
-
 	"stl/functional"
 	"stl/iterator"
 )
@@ -48,7 +46,7 @@ func AdjacentFind() {
 func Count(first, last iterator.InputIterator, val interface{}) int {
 	res := 0
 
-	for i := first.Clone(); !i.Equal(last); i.Next() {
+	for i := CloneInput(first); !i.Equal(last); i.Next() {
 		if i.Value() == val {
 			res++
 		}
@@ -62,7 +60,7 @@ func Count(first, last iterator.InputIterator, val interface{}) int {
 func CountIf(first, last iterator.InputIterator, pred functional.Pred) int {
 	res := 0
 
-	for i := first.Clone(); !i.Equal(last); i.Next() {
+	for i := CloneInput(first); !i.Equal(last); i.Next() {
 		if pred(i.Value()) {
 			res++
 		}
@@ -77,10 +75,10 @@ func Mismatch() {
 }
 
 // Equal test whether the elements in two ranges are equal
-func Equal(first, last iterator.RandomAccessIterator, first2 iterator.RandomAccessIterator) bool {
-	j := first2.Clone()
-	for i := first.Clone(); !i.Equal(last); i.Next() {
-		if !reflect.DeepEqual(i.Value(), j.Value()) {
+func Equal(first, last iterator.Iterator, first2 iterator.Iterator) bool {
+	j := Clone(first2)
+	for i := Clone(first); !i.Equal(last); i.Next() {
+		if !i.Equal(j) {
 			return false
 		}
 		j.Next()

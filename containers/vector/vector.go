@@ -141,9 +141,9 @@ func (v *Vector) iterAt(pos int) iterator.RandomAccessIterator {
 	return NewIterator(v, pos)
 }
 
-func (v *Vector) constIterAt(pos int) iterator.InputIterator {
-	return NewInputIterator(v, pos)
-}
+//func (v *Vector) constIterAt(pos int) iterator.InputIterator {
+//	return NewInputIterator(v, pos)
+//}
 
 // Begin Return iterator to beginning
 func (v *Vector) Begin() iterator.RandomAccessIterator {
@@ -168,33 +168,26 @@ func (v *Vector) REnd() iterator.RandomAccessIterator {
 	return v.iterAt(-1)
 }
 
-// CBegin Return const_iterator to beginning
-func (v *Vector) CBegin() iterator.InputIterator {
-	return v.constIterAt(0)
-}
-
-// CEnd Return const_iterator to end
-func (v *Vector) CEnd() iterator.InputIterator {
-	return v.constIterAt(v.Size())
-}
-
-// CRBegin Return const_reverse_iterator to reverse beginning
-func (v *Vector) CRBegin() iterator.InputIterator {
-	return v.constIterAt(v.Size() - 1)
-}
-
-// CREnd Return const_reverse_iterator to reverse end
-func (v *Vector) CREnd() iterator.InputIterator {
-	return v.constIterAt(-1)
-}
-
-func (v *Vector) OBegin() iterator.OutputIterator {
-	return NewOutputIterator(v, 0)
-}
-
-func (v *Vector) OEnd() iterator.OutputIterator {
-	return NewOutputIterator(v, v.Size()-1)
-}
+//
+//// CBegin Return const_iterator to beginning
+//func (v *Vector) CBegin() iterator.InputIterator {
+//	return v.constIterAt(0)
+//}
+//
+//// CEnd Return const_iterator to end
+//func (v *Vector) CEnd() iterator.InputIterator {
+//	return v.constIterAt(v.Size())
+//}
+//
+//// CRBegin Return const_reverse_iterator to reverse beginning
+//func (v *Vector) CRBegin() iterator.InputIterator {
+//	return v.constIterAt(v.Size() - 1)
+//}
+//
+//// CREnd Return const_reverse_iterator to reverse end
+//func (v *Vector) CREnd() iterator.InputIterator {
+//	return v.constIterAt(-1)
+//}
 
 // Size Return Size()
 func (v *Vector) Size() int {
@@ -281,9 +274,9 @@ func (v *Vector) Assign(size int, value int) {
 	}
 }
 
-func (v *Vector) AssignIter(a iterator.RandomAccessIterator, b iterator.RandomAccessIterator) {
-	i1 := a.Clone()
-	i2 := b.Clone()
+func (v *Vector) AssignIter(a, b iterator.RandomAccessIterator) {
+	i1 := a.Clone().(iterator.RandomAccessIterator)
+	i2 := b.Clone().(iterator.RandomAccessIterator)
 
 	for !i1.Equal(i2) {
 		v.PushBack(i1.Value())
@@ -381,7 +374,7 @@ func (v *Vector) Emplace(pos iterator.RandomAccessIterator, value interface{}) i
 
 // EmplaceBack Construct and insert element at the end
 func (v *Vector) EmplaceBack(value interface{}) iterator.RandomAccessIterator {
-	return v.Insert(v.End().Pre(), value)
+	return v.Insert(v.End().Pre().(iterator.RandomAccessIterator), value)
 }
 
 func (v *Vector) String() string {

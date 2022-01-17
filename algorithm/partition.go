@@ -14,12 +14,10 @@ import (
 
 // IsPartitioned test whether range is partitioned
 func IsPartitioned(first, last iterator.RandomAccessIterator, pred functional.Pred) bool {
-	i := first.Clone()
+	i := Clone(first)
 
-	for !i.Equal(last) {
-		if pred(i.Value()) {
-			i.Next()
-		}
+	for !i.Equal(last) && pred(i.Value()) {
+		i.Next()
 	}
 
 	for !i.Equal(last) {
@@ -33,8 +31,8 @@ func IsPartitioned(first, last iterator.RandomAccessIterator, pred functional.Pr
 
 // Partition range in two
 func Partition(first, last iterator.RandomAccessIterator, pred functional.Pred) iterator.RandomAccessIterator {
-	i := first.Clone()
-	j := last.Clone().Pre()
+	i := Clone(first)
+	j := Pre(last)
 
 	for i.IsFrontEqual(j) {
 		if pred(i.Value()) {
@@ -62,50 +60,94 @@ func StablePartition(first, last iterator.RandomAccessIterator, pred functional.
 	if m.Frees > 10 {
 		return stablePartitionAdaptive(first, last, pred)
 	}
+
 	// 原地算法
 	return inplaceStablePartition(first, last, pred)
 }
 
+// TODO：快慢指针失败了，并不稳定，修改为归并递归 O(log^n)
 func inplaceStablePartition(first, last iterator.RandomAccessIterator, pred functional.Pred) iterator.RandomAccessIterator {
-	return nil
+	i := Clone(first)
+	j := Clone(first)
+
+	for !i.Equal(last) && !j.Equal(last) {
+		if pred(i.Value()) {
+			i.Next()
+			continue
+		}
+		j = Clone(i)
+		for !j.Equal(last) && !pred(j.Value()) {
+			j.Next()
+		}
+		if j.Equal(last) {
+			break
+		}
+		Swap(i, j)
+		i.Next()
+		j.Next()
+	}
+
+	return first
 }
 
 func stablePartitionAdaptive(first, last iterator.RandomAccessIterator, pred functional.Pred) iterator.RandomAccessIterator {
 	v1 := vector.New()
 	v2 := vector.New()
 
-	for i := first.Clone(); !i.Equal(last); i.Next() {
-		if pred(i.Value()) {
-			v1.PushBack(i.Value())
+	ForEach(first, last, func(val interface{}) {
+		if pred(val) {
+			v1.PushBack(val)
 		} else {
-			v2.PushBack(i.Value())
+			v2.PushBack(val)
 		}
-	}
+	})
 
-	//Copy(v1.Begin(), v1.End(),)
+	Copy(v1.Begin(), v1.End(), first)
+	Copy(v2.Begin(), v2.End(), NextN(first, Distance(v1.Begin(), v1.End())))
 
 	return nil
 }
 
 // PartitionCopy partition range into two
 func PartitionCopy(first, last iterator.InputIterator, resultTrue, resultFalse iterator.OutputIterator, pred functional.Pred) (iterator.OutputIterator, iterator.OutputIterator) {
-	t := resultTrue.Clone()
-	f := resultFalse.Clone()
+	t := CloneOutput(resultTrue)
+	f := CloneOutput(resultFalse)
 
-	for i := first.Clone(); !i.Equal(last); i.Next() {
-		if pred(i.Value()) {
-			t.SetValue(i.Value())
+	ForEach(first, last, func(val interface{}) {
+		if pred(val) {
+			t.SetValue(val)
 			t.Next()
 		} else {
-			f.SetValue(i.Value())
+			f.SetValue(val)
 			f.Next()
 		}
-	}
+
+	})
 
 	return resultTrue, resultFalse
 }
 
 // PartitionPoint get partition point
-func PartitionPoint() {
+// Returns an iterator to the first element in the partitioned
+//range [first,last) for which pred is not true, indicating its
+//partition point.
+//The elements in the range shall already be partitioned, as if
+//partition had been called with the same arguments.
+func PartitionPoint(first, last iterator.ForwardIterator, pred functional.Pred) iterator.ForwardIterator {
+	n := Distance(first, last)
 
+	for n > 0 {
+		it := CloneForward(first)
+		step := n / 2
+		Advance(it, step)
+
+		if pred(it.Value()) {
+			first = Next(it)
+			n -= step + 1
+		} else {
+			n = step
+		}
+	}
+
+	return first
 }
