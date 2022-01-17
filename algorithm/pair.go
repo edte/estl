@@ -1,6 +1,10 @@
 // @program:     tiny-stl
-// @file:        count.go
+// @file:        pair.go
 // @author:      edte
-// @create:      2021-12-30 16:08
+// @create:      2022-01-16 21:51
 // @description:
 package algorithm
+
+func MakePair() {
+
+}

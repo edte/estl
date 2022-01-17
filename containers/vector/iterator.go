@@ -6,10 +6,15 @@
 package vector
 
 import (
+	"fmt"
+
 	"stl/iterator"
 )
 
 type Iterator struct {
+	InputIterator
+	OutputIterator
+	ForwardIterator
 	data *Vector
 	pos  int
 }
@@ -43,20 +48,20 @@ func (iter *Iterator) Pre() iterator.RandomAccessIterator {
 }
 
 func (iter *Iterator) PreN(n int) iterator.RandomAccessIterator {
-	if iter.pos-n == -1 {
-		return iter
-	}
+	// if iter.pos-n == -1 {
+	// 	return iter
+	// }
 	iter.pos -= n
 	return iter
 }
 
 func (iter *Iterator) IteratorAt(pos int) iterator.RandomAccessIterator {
-	if pos < 0 {
-		pos = 0
-	}
-	if pos > iter.data.Size() {
-		pos = iter.data.Size()
-	}
+	// if pos < 0 {
+	// 	pos = 0
+	// }
+	// if pos > iter.data.Size() {
+	// 	pos = iter.data.Size()
+	// }
 	iter.pos = pos
 	return iter
 }
@@ -78,7 +83,7 @@ func (iter *Iterator) IsFront(other iterator.RandomAccessIterator) bool {
 	if !ok {
 		return false
 	}
-	return i.data == iter.data && i.pos < iter.pos
+	return i.data == iter.data && i.pos > iter.pos
 }
 
 func (iter *Iterator) IsBack(other iterator.RandomAccessIterator) bool {
@@ -86,7 +91,7 @@ func (iter *Iterator) IsBack(other iterator.RandomAccessIterator) bool {
 	if !ok {
 		return false
 	}
-	return i.data == iter.data && i.pos > iter.pos
+	return i.data == iter.data && i.pos < iter.pos
 
 }
 
@@ -95,7 +100,7 @@ func (iter *Iterator) IsFrontEqual(other iterator.RandomAccessIterator) bool {
 	if !ok {
 		return false
 	}
-	return i.data == iter.data && i.pos <= iter.pos
+	return i.data == iter.data && i.pos >= iter.pos
 }
 
 func (iter *Iterator) IsBackEqual(other iterator.RandomAccessIterator) bool {
@@ -103,19 +108,19 @@ func (iter *Iterator) IsBackEqual(other iterator.RandomAccessIterator) bool {
 	if !ok {
 		return false
 	}
-	return i.data == iter.data && i.pos >= iter.pos
+	return i.data == iter.data && i.pos <= iter.pos
 }
 
 func (iter *Iterator) HasNext() bool {
-	return iter.pos == iter.data.Size()
+	return iter.pos < iter.data.Size()
 }
 
 func (iter *Iterator) HasPre() bool {
-	return iter.pos == -1
+	return iter.pos > -1
 }
 
 func (iter *Iterator) IsValid() bool {
-	return iter.pos >= -1 && iter.pos <= iter.data.Size()
+	return iter.pos > -1 && iter.pos <= iter.data.Size()
 }
 
 func (iter *Iterator) Value() interface{} {
@@ -141,4 +146,8 @@ func (iter *Iterator) Distance(other iterator.RandomAccessIterator) int {
 
 func (iter *Iterator) Position() int {
 	return iter.pos
+}
+
+func (iter *Iterator) String() string {
+	return fmt.Sprint(iter.Value())
 }

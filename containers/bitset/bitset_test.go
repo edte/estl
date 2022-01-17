@@ -104,3 +104,15 @@ func TestBitSet_ToUint32(t *testing.T) {
 func TestBitSet_ToUint64(t *testing.T) {
 
 }
+
+func TestBitSet_Test(t *testing.T) {
+	b := New()
+	b.Set(2)
+	b.Set(3)
+	b.Set(5)
+	fmt.Println(b)
+	fmt.Println(b.Test(4))
+	fmt.Println(b.Test(3))
+	fmt.Println(b.Test(7))
+	fmt.Println(b.Test(5))
+}

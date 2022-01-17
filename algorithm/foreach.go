@@ -6,10 +6,11 @@
 package algorithm
 
 import (
+	"stl/functional"
 	"stl/iterator"
 )
 
-func ForEach(first iterator.RandomAccessIterator, last iterator.RandomAccessIterator, f func(val interface{})) {
+func ForEach(first iterator.RandomAccessIterator, last iterator.RandomAccessIterator, f functional.Op) {
 	i := first.Clone()
 	for ; !i.Equal(last); i.Next() {
 		f(i.Value())

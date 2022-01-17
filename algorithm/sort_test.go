@@ -8,6 +8,7 @@ package algorithm
 import (
 	"fmt"
 	"math/rand"
+	"sort"
 	"testing"
 
 	"stl/comparator"
@@ -77,6 +78,33 @@ func TestHeapSort(t *testing.T) {
 	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
 	// v := vector.New(vector.WithData([]interface{}{3, 2, 3, -1, 3, 1, 1}))
 	heapSort(v.Begin(), v.End())
+	fmt.Println(v)
+	fmt.Println(IsSorted(v.Begin(), v.End()))
+}
+
+func TestCountSort(t *testing.T) {
+	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1, 134, 22, -234, -3, 34, 5, 1, 623, -24, 555, 3, 7, -2}))
+	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
+	// v := vector.New(vector.WithData([]interface{}{3, 2, 4, 1, 1}))
+	countSort(v.Begin(), v.End(), comparator.NewLess())
+	fmt.Println(v)
+	fmt.Println(IsSorted(v.Begin(), v.End()))
+}
+
+func TestBucketSort(t *testing.T) {
+	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1, 134, 22, -234, -3, 34, 5, 1, 623, -24, 555, 3, 7, -2}))
+	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
+	// v := vector.New(vector.WithData([]interface{}{13, 2, 14, 1, 1}))
+	bucketSort(v.Begin(), v.End(), comparator.NewLess())
+	fmt.Println(v)
+	fmt.Println(IsSorted(v.Begin(), v.End()))
+}
+
+func TestRadioSort(t *testing.T) {
+	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1, 134, 22, -234, -3, 34, 5, 1, 623, -24, 555, 3, 7, -2}))
+	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
+	// v := vector.New(vector.WithData([]interface{}{23, 22, 14, 13, 1, 6, 0}))
+	radioSort(v.Begin(), v.End(), comparator.NewLess())
 	fmt.Println(v)
 	fmt.Println(IsSorted(v.Begin(), v.End()))
 }
@@ -223,7 +251,37 @@ func BenchmarkHeapSort(b *testing.B) {
 		v := get()
 		b.StartTimer()
 		heapSort(v.Begin(), v.End())
-		fmt.Println(IsSorted(v.Begin(), v.End()))
+		// fmt.Println(IsSorted(v.Begin(), v.End()))
+	}
+}
+
+func BenchmarkCountSort(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		v := get()
+		b.StartTimer()
+		countSort(v.Begin(), v.End())
+		// fmt.Println(IsSorted(v.Begin(), v.End()))
+	}
+}
+
+func BenchmarkBucketSort(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		v := get()
+		b.StartTimer()
+		bucketSort(v.Begin(), v.End())
+		// fmt.Println(IsSorted(v.Begin(), v.End()))
+	}
+}
+
+func BenchmarkRadioSort(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		v := get()
+		b.StartTimer()
+		radioSort(v.Begin(), v.End())
+		// fmt.Println(IsSorted(v.Begin(), v.End()))
 	}
 }
 
@@ -233,6 +291,17 @@ func BenchmarkSort(b *testing.B) {
 		v := get()
 		b.StartTimer()
 		Sort(v.Begin(), v.End())
+	}
+}
+
+func BenchmarkStdSort(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		v := get()
+		b.StartTimer()
+		sort.Sort(v)
+		// Sort(v.Begin(), v.End())
+		// fmt.Println(IsSorted(v.Begin(), v.End()))
 	}
 }
 
@@ -254,4 +323,23 @@ func TestGetDepth(t *testing.T) {
 	v := vector.New(vector.WithCapInit(1e9, 1))
 	depth := getDepth(v.Begin(), v.End())
 	fmt.Println(depth)
+}
+
+func TestPartialSort(t *testing.T) {
+	// v := vector.New(vector.WithData([]interface{}{69, 23, 80, 42, 17, 15, 26, 51, 19, 12, 45, 72}))
+	// PartialSort(v.Begin(), v.Begin().NextN(7), v.End())
+	// fmt.Println(v)
+
+	v := vector.New(vector.WithData([]interface{}{9, 8, 7, 6, 5, 4, 3, 2, 1}))
+	PartialSort(v.Begin(), v.Begin().NextN(5), v.End(), comparator.NewLess())
+	fmt.Println(v)
+}
+
+func TestPartialSortCopy(t *testing.T) {
+	v := vector.New(vector.WithData([]interface{}{9, 8, 7, 6, 5, 4, 3, 2, 1}))
+	res := vector.New(vector.WithCap(5))
+
+	PartialSortCopy(v.Begin(), v.End(), res.Begin(), res.End())
+
+	fmt.Println(res)
 }

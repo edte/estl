@@ -160,11 +160,7 @@ func SortHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 	for !i.Equal(first) {
 		Swap(first, i)
 
-		// ShowHeap(first, last)
-
 		siftDown(first, i, first, c)
-
-		// ShowHeap(first, last)
 
 		i.Pre()
 	}

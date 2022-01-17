@@ -51,6 +51,18 @@ type Vector struct {
 	locker locker.Locker
 }
 
+func (v *Vector) Len() int {
+	return len(v.data)
+}
+
+func (v *Vector) Less(i, j int) bool {
+	return v.data[i].(int) < v.data[j].(int)
+}
+
+func (v *Vector) Swap(i, j int) {
+	v.data[i], v.data[j] = v.data[j], v.data[i]
+}
+
 // New Construct
 func New(opts ...Option) *Vector {
 	v := &Vector{
@@ -68,10 +80,12 @@ func New(opts ...Option) *Vector {
 
 func WithVector(nv *Vector) Option {
 	return func(v *Vector) {
-		v.data = make([]interface{}, nv.Size(), nv.Capacity())
-		for i := range v.data {
-			v.data[i] = nv.data[i]
-		}
+		v.InsertIter(v.Begin(), nv.Begin(), nv.End())
+
+		// v.data = make([]interface{}, nv.Size(), nv.Capacity())
+		// for i := range v.data {
+		// 	v.data[i] = nv.data[i]
+		// }
 	}
 }
 
@@ -159,7 +173,7 @@ func (v *Vector) CBegin() iterator.InputIterator {
 	return v.constIterAt(0)
 }
 
-// Cend Return const_iterator to end
+// CEnd Return const_iterator to end
 func (v *Vector) CEnd() iterator.InputIterator {
 	return v.constIterAt(v.Size())
 }
@@ -172,6 +186,14 @@ func (v *Vector) CRBegin() iterator.InputIterator {
 // CREnd Return const_reverse_iterator to reverse end
 func (v *Vector) CREnd() iterator.InputIterator {
 	return v.constIterAt(-1)
+}
+
+func (v *Vector) OBegin() iterator.OutputIterator {
+	return NewOutputIterator(v, 0)
+}
+
+func (v *Vector) OEnd() iterator.OutputIterator {
+	return NewOutputIterator(v, v.Size()-1)
 }
 
 // Size Return Size()
@@ -339,12 +361,13 @@ func (v *Vector) EraseIter(first iterator.RandomAccessIterator, last iterator.Ra
 	return NewIterator(v, l)
 }
 
-// Swap content
+/*// Swap content
 func (v *Vector) Swap(n *Vector) {
 	t := v.data
 	v.data = n.data
 	n.data = t
 }
+*/
 
 // Clear content
 func (v *Vector) Clear() {

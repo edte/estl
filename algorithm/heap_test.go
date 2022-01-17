@@ -141,9 +141,9 @@ func TestGetLevel(t *testing.T) {
 func TestSortHeap(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{1, 8, -1, 88, 1, 3, 4, 5, 6, 7, 8, 8, 2, 6, 1, 3, 1}))
 	// fmt.Println(ShowHeap(v.Begin(), v.End()))
-	MakeHeap(v.Begin(), v.End(), comparator.NewLess())
+	MakeHeap(v.Begin(), v.End())
 	// fmt.Println(ShowHeap(v.Begin(), v.End()))
-	SortHeap(v.Begin(), v.End(), comparator.NewLess())
+	SortHeap(v.Begin(), v.End())
 	// fmt.Println(ShowHeap(v.Begin(), v.End()))
 
 	ForEach(v.Begin(), v.End(), func(val interface{}) {

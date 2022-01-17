@@ -1,6 +1,6 @@
 // @program:     tiny-stl
-// @file:        reverse.go
+// @file:        random.go
 // @author:      edte
-// @create:      2021-12-30 16:09
+// @create:      2022-01-13 23:08
 // @description:
 package algorithm

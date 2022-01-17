@@ -15,9 +15,12 @@ type Comparator interface {
 }
 
 func Reserve(c Comparator) Comparator {
+
 	return New(func(a interface{}, b interface{}) bool {
 		return !c.Operator(a, b)
-	})
+	}, WithCmp(func(a interface{}, b interface{}) int {
+		return -c.Cmp(a, b)
+	}))
 }
 
 type Option func(d *Default)
@@ -67,6 +70,7 @@ func NewGreater() *Greater {
 }
 
 // Operator 默认相等时不交换，这样许多排序默认就是稳定的
+// 升序
 func (l *Greater) Operator(a interface{}, b interface{}) bool {
 	switch a.(type) {
 	case int:
@@ -286,6 +290,7 @@ func (e *EGreater) Operator(a interface{}, b interface{}) bool {
 	}
 }
 
+// Less 降序
 type Less struct {
 }
 

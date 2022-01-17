@@ -28,7 +28,7 @@ func TestVector_Swap(t *testing.T) {
 	fmt.Println(v)
 	fmt.Println(v2)
 
-	v.Swap(v2)
+	// v.Swap(v2)
 
 	fmt.Println(v)
 	fmt.Println(v2)

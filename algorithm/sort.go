@@ -7,6 +7,7 @@ package algorithm
 
 import (
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -425,30 +426,169 @@ func heapSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 }
 
 // 计数排序
+// 原理就是简单的把相同的数映射到按大小排列的桶里面，然后再遍历桶取出数即可
+// 映射的规则一般最简单的就是直接 f(x)=x，不过 x 可能有负数，故通常
+// 会取最小值，然后存到最小值之间的距离
+// 计数排序不是基于比较的排序，故突破了 O(n*log^n) 的时间复杂度下限
+// 时间复杂度为 O(n)，但是空间复杂度也是 O(n)
+// 计数排序由于需要额外的桶来存储数据，故通常比较适合于数据分布密集的排序
+// 要保持稳定性，需要对计数数组进行前缀和处理
 func countSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
 	var c comparator.Comparator = comparator.NewGreater()
 	if len(cmp) != 0 {
 		c = cmp[0]
 	}
-	fmt.Println(c)
+
+	min, max := MaxMinElement(first, last)
+
+	t := vector.New(vector.WithCapInit(max.Value().(int)-min.Value().(int)+1, 0))
+	j := 0
+	for i := first.Clone(); !i.Equal(last); i.Next() {
+		index := i.Value().(int) - min.Value().(int)
+		t.SetAt(index, t.At(index).(int)+1)
+		j++
+	}
+
+	tt := first.Clone()
+
+	for i := t.Begin(); !i.Equal(t.End()); i.Next() {
+		d := i.Value().(int)
+
+		for d != 0 {
+			tt.SetValue(i.Position() + min.Value().(int))
+			tt.Next()
+			d--
+		}
+	}
+
+	if c.Operator(first.Value(), first.Clone().Next().Value()) {
+		Reverse(first, last)
+	}
 }
 
 // 桶排序
+// 桶排序不是具体的排序算法，而是一种排序的思想，就是分治
+// 将原数据映射到不同的桶中，然后对不同的桶里的元素进行排序，具体的排序算法不固定
+// 最后再把桶中的元素取出来汇总
+// 比较重要的就是这种映射的思想，在很多算法中经常用到，通常用来分组，类似于哈希
+// 而不光是排序
+// 计数排序和基数排序就可以说是桶排的一种引申或变形
+// 计数排序也是分桶，不过分桶的过程中就利用了桶的性质进行了排序，而不需要映射后再排
+// 同样的，基数排序也是映射的时候就根据映射规则和桶的性质进行了排序，不过
+// 基数排序是进行多次映射，每次映射得到部分有序而已
 func bucketSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
+	// 每个桶里 10 个元素
+	bucketElemNum := 10
+
+	min, max := MaxMinElement(first, last)
+	bucketNum := (max.Value().(int)-min.Value().(int))/bucketElemNum + 1
+
+	v := vector.New()
+	for i := 0; i < bucketNum; i++ {
+		v.PushBack(vector.New())
 	}
-	fmt.Println(c)
+
+	// 第 i 个桶存放值为 10i ~ 11i-1 的元素
+	for i := first.Clone(); !i.Equal(last); i.Next() {
+		data := i.Value().(int) - min.Value().(int)
+		index := data / bucketElemNum
+		t := v.At(index).(*vector.Vector)
+		t.PushBack(data)
+	}
+
+	res := first.Clone()
+
+	ForEach(v.Begin(), v.End(), func(val interface{}) {
+		ve := val.(*vector.Vector)
+		if ve.Empty() {
+			return
+		}
+		Sort(ve.Begin(), ve.End(), comparator.NewGreater())
+
+		ForEach(ve.Begin(), ve.End(), func(vv interface{}) {
+			res.SetValue(vv.(int) + min.Value().(int))
+			res.Next()
+			// fmt.Print(vv.(int) + min.Value().(int))
+			// fmt.Print(" ")
+		})
+		// fmt.Println()
+	})
 }
 
 // 基数排序
+// 基数排序就是桶排序+计数排序的引申，算是多种思想的统一
+// 基数排序利用了技术排序的思想，即开一些具体大小性质的桶，然后通过映射
+// 到不同桶中同时进行排序
+// 而又不同于计数排序，基数排序利用到需要排序数的本身性质，将数分为不同的
+// 特征，然后按照特征排序，每次都得到一个部分排序的结果
+// 这是一个分治的思想，多次部分排序后得到总体有序，有点类似于堆排的感觉
+// 基数、计数、桶排都利用了额外空间，不是基于比较的排序，因此忽略常数的话
+// 时间复杂度能达到 O(n)，但实际上真正使用的场景不是很多，这种思想倒是
+// 在一些算法上有所体现
+// 比如可以按照数字的位数来排序，先比较低位，再高位等等，也可以先比较高位，
+// 反过来排，但是这样每个位里面又要再开一些桶来进行排序，空间使用得太多
+// 故比较常见的都是从开 10 个桶，从低位开始排
+// 同时类似的，比如对时间进行排序，可以按照秒、分钟等来排序
+// 还有对字符串的排序等， 都是其它排序难以做到的，这是基数排序的优势所在
 func radioSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
 	var c comparator.Comparator = comparator.NewGreater()
 	if len(cmp) != 0 {
 		c = cmp[0]
 	}
-	fmt.Println(c)
+
+	a, m := MaxMinElement(first, last)
+	min := a.Value().(int)
+	// 预处理，全部变成正数
+	for i := first.Clone(); !i.Equal(last); i.Next() {
+		i.SetValue(i.Value().(int) - min)
+	}
+	max := m.Value().(int) - min
+
+	// 获取最大值的位数
+	n := 0
+
+	for max != 0 {
+		n++
+		max /= 10
+	}
+
+	// 排序需要的桶
+	bucket := vector.New()
+	for i := 0; i < 10; i++ {
+		bucket.PushBack(vector.New())
+	}
+
+	for i := 0; i < n; i++ {
+		for iter := first.Clone(); !iter.Equal(last); iter.Next() {
+			d := (iter.Value().(int) / int(math.Ceil(math.Pow10(i)))) % 10
+			v := bucket.At(d).(*vector.Vector)
+			v.PushBack(iter.Value())
+		}
+
+		out := first.Clone()
+
+		ForEach(bucket.Begin(), bucket.End(), func(val interface{}) {
+			v := val.(*vector.Vector)
+			if v.Empty() {
+				return
+			}
+			ForEach(v.Begin(), v.End(), func(dd interface{}) {
+				out.SetValue(dd)
+				out.Next()
+			})
+			v.Clear()
+		})
+	}
+
+	// 恢复数据
+	for i := first.Clone(); !i.Equal(last); i.Next() {
+		i.SetValue(i.Value().(int) + min)
+	}
+
+	// 如果不是按比较器来的，则反转
+	if c.Operator(first.Value(), first.Clone().Next().Value()) {
+		Reverse(first, last)
+	}
 }
 
 // Sort elements in range
@@ -466,20 +606,6 @@ func Sort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparato
 // StableSort sort elements preserving order of equivalents
 func StableSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
 	mergeSort(first, last, cmp...)
-}
-
-// PartialSort partially sort elements in range
-func PartialSort(first, middle, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-	fmt.Println(c)
-}
-
-// PartialSortCopy copy and partially sort range
-func PartialSortCopy() {
-
 }
 
 // IsSorted check whether range is sorted
@@ -525,4 +651,43 @@ func IsSortedUntil(first, last iterator.RandomAccessIterator, cmp ...comparator.
 // version, and comp for the second.
 func NthElement(first, nth, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
 
+}
+
+// PartialSort partially sort elements in range
+func PartialSort(first, middle, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
+	var c comparator.Comparator = comparator.NewGreater()
+	if len(cmp) != 0 {
+		c = cmp[0]
+	}
+
+	MakeHeap(first, middle, comparator.Reserve(c))
+
+	for i := middle.Clone(); !i.Equal(last); i.Next() {
+		if c.Operator(first.Value(), i.Value()) {
+			Swap(first, i)
+			MakeHeap(first, middle, comparator.NewLess())
+		}
+	}
+
+	SortHeap(first, middle, comparator.Reserve(c))
+
+	if c.Operator(first.Value(), first.Clone().Next().Value()) {
+		Reverse(first, middle)
+	}
+}
+
+// PartialSortCopy copy and partially sort range
+func PartialSortCopy(first, last, resultFirst, resultLast iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
+	t := vector.New(vector.WithIter(first, last))
+
+	d := Distance(resultFirst, resultLast)
+
+	PartialSort(t.Begin(), t.Begin().NextN(d), t.End(), cmp...)
+
+	j := t.Begin()
+
+	for i := resultFirst.Clone(); !i.Equal(resultLast); i.Next() {
+		i.SetValue(j.Value())
+		j.Next()
+	}
 }

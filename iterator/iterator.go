@@ -5,6 +5,20 @@
 // @description:
 package iterator
 
+type Iterator interface {
+	// 下一个迭代器
+	Next() Iterator
+	// 克隆迭代器
+	Clone() Iterator
+
+	// 判断后面是否还有迭代器
+	HasNext() bool
+	// 比较迭代器是否相等
+	Equal(other Iterator) bool
+	// 判断迭代器是否有效
+	IsValid() bool
+}
+
 // InputIterator 可读向前遍历的迭代器
 // find 和 accumulate
 type InputIterator interface {
@@ -39,7 +53,7 @@ type OutputIterator interface {
 	IsValid() bool
 
 	// 设置迭代器的值
-	SetValue(value interface{}) interface{}
+	SetValue(value interface{})
 }
 
 // ForwardIterator 可读可写向前遍历的迭代器
@@ -59,7 +73,7 @@ type ForwardIterator interface {
 	// 解引用，获取迭代器的值
 	Value() interface{}
 	// 设置迭代器的值
-	SetValue(value interface{}) interface{}
+	SetValue(value interface{})
 }
 
 // BidirectionalIterator 可读可写双向遍历迭代器
@@ -84,7 +98,7 @@ type BidirectionalIterator interface {
 	// 解引用，获取迭代器的值
 	Value() interface{}
 	// 设置迭代器的值
-	SetValue(value interface{}) interface{}
+	SetValue(value interface{})
 }
 
 // RandomAccessIterator 可读可写随机访问迭代器
@@ -115,7 +129,7 @@ type RandomAccessIterator interface {
 	IsBackEqual(other RandomAccessIterator) bool
 	// 判断后面是否还有迭代器
 	HasNext() bool
-	// 判断后面是否还有迭代器
+	// 判断前面是否还有迭代器
 	HasPre() bool
 	// 判断迭代器是否有效
 	IsValid() bool
