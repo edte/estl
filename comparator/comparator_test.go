@@ -29,7 +29,7 @@ func TestDefault_Operator(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := &Default{}
+			d := &DefaultCmp{}
 			if got := d.Operator(tt.args.a, tt.args.b); got != tt.want {
 				t.Errorf("Operator() = %v, want %v", got, tt.want)
 			}
@@ -71,7 +71,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *Default
+		want *DefaultCmp
 	}{
 		// TODO: Add test cases.
 	}

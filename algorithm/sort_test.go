@@ -43,6 +43,7 @@ func TestSellSort(t *testing.T) {
 
 func TestMergeSort(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1}))
+	//v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1}))
 	mergeSort(v.Begin(), v.End())
 	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
@@ -102,6 +103,14 @@ func TestRadioSort(t *testing.T) {
 	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
 	// v := vector.New(vector.WithData([]interface{}{23, 22, 14, 13, 1, 6, 0}))
 	radioSort(v.Begin(), v.End(), comparator.NewLess())
+	assert.True(t, IsSorted(v.Begin(), v.End()))
+}
+
+func TestTimSort(t *testing.T) {
+	v := vector.New(vector.WithData([]interface{}{9, 3, 6, 3, 1, 5, 2, 99, -1, 134, 22, -234, -3, 34, 5, 1, 623, -24, 555, 3, 7, -2}))
+	// v := vector.New(vector.WithData([]interface{}{5, 2, 99, -1, 134, 22, 1, 3, 34, 5, 1, 623, 6, 555, 3, 7, 9, 3}))
+	// v := vector.New(vector.WithData([]interface{}{23, 22, 14, 13, 1, 6, 0}))
+	timSort(v.Begin(), v.End(), comparator.NewLess())
 	assert.True(t, IsSorted(v.Begin(), v.End()))
 }
 
@@ -338,4 +347,17 @@ func TestPartialSortCopy(t *testing.T) {
 	PartialSortCopy(v.Begin(), v.End(), res.Begin(), res.End())
 
 	fmt.Println(res)
+}
+
+func TestNthElement(t *testing.T) {
+	v := vector.New(vector.WithData([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9}))
+
+	for i := 0; i < 1e2; i++ {
+		Shuffle(v.Begin(), v.End())
+		//NthElement(v.Begin(), NextN(v.Begin(), 5), v.End())
+		//assert.Equal(t, 6, v.At(5))
+
+		NthElement(v.Begin(), NextN(v.Begin(), 5), v.End(), comparator.NewLess())
+		assert.Equal(t, 4, v.At(5))
+	}
 }

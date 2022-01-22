@@ -8,6 +8,7 @@ package algorithm
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"stl/iterator"
 	"testing"
 
 	"stl/containers/vector"
@@ -59,4 +60,23 @@ func TestPreN(t *testing.T) {
 	it := v.End().Pre()
 	assert.Equal(t, "2", fmt.Sprint(PreN(it, 3)))
 	assert.Equal(t, "8", fmt.Sprint(it))
+}
+
+func TestDistance1(t *testing.T) {
+	type args struct {
+		first iterator.Iterator
+		last  iterator.Iterator
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, Distance(tt.args.first, tt.args.last), "Distance(%v, %v)", tt.args.first, tt.args.last)
+		})
+	}
 }

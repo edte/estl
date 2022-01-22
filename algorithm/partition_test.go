@@ -8,6 +8,7 @@ package algorithm
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"stl/functional"
 	"stl/iterator"
 	"testing"
 
@@ -39,9 +40,7 @@ func TestPartition(t *testing.T) {
 func TestPartitionCopy(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9}))
 
-	isOdd := func(i interface{}) bool {
-		return i.(int)%2 != 0
-	}
+	isOdd := functional.IsOdd
 
 	odd := vector.New(vector.WithCap(CountIf(v.Begin(), v.End(), isOdd)))
 	even := vector.New(vector.WithCap(v.Size() - odd.Size()))
@@ -116,9 +115,8 @@ func TestPartitionPoint(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9}))
 	odd := vector.New()
 
-	isOdd := func(x interface{}) bool {
-		return x.(int)%2 == 1
-	}
+	isOdd := functional.IsOdd
+
 	StablePartition(v.Begin(), v.End(), isOdd)
 
 	assert.Equal(t, "1 3 5 7 9 2 4 6 8 ", v.String())

@@ -6,7 +6,6 @@
 package main
 
 import (
-	"fmt"
 	"stl/algorithm"
 	"stl/containers/vector"
 )
@@ -15,7 +14,5 @@ func main() {
 	v := vector.New()
 	v.PushBack(23)
 	v.PushBack(3)
-	algorithm.ForEach(v.Begin(), v.End(), func(val interface{}) {
-		fmt.Println(val)
-	})
+	algorithm.ForEach(v.Begin(), v.End())
 }

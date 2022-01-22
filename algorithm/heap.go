@@ -16,10 +16,7 @@ import (
 
 // PushHeap push element into heap range
 func PushHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
+	c := comparator.Default(cmp...)
 	siftUp(first, last.Clone().(iterator.RandomAccessIterator).Pre().(iterator.RandomAccessIterator), c)
 }
 
@@ -121,22 +118,14 @@ func getFirstLeaf(first, last iterator.RandomAccessIterator) iterator.RandomAcce
 
 // PopHeap pop element from heap range
 func PopHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	Swap(first, last.Clone().(iterator.RandomAccessIterator).Pre())
 	siftDown(first, last.Clone().(iterator.RandomAccessIterator).Pre().(iterator.RandomAccessIterator), first, c)
 }
 
 // MakeHeap make heap from range
 func MakeHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	leaf := getLastNotLeaf(first, last)
 
 	// 从下往上遍历所有非叶子节点
@@ -150,11 +139,7 @@ func MakeHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 // SortHeap selectSort elements of heap
 // 要使用堆排，必须已经是一个堆才行
 func SortHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	i := Pre(last)
 
 	for !i.Equal(first) {
@@ -170,11 +155,7 @@ func SortHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 
 // IsHeap test if range is heap
 func IsHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) bool {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	q := queue.New()
 	q.Push(first)
 
@@ -203,11 +184,7 @@ func IsHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Compara
 
 // IsHeapUntil find first element not in heap order
 func IsHeapUntil(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) iterator.RandomAccessIterator {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	q := queue.New()
 	q.Push(first)
 

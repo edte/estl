@@ -94,12 +94,13 @@ func stablePartitionAdaptive(first, last iterator.RandomAccessIterator, pred fun
 	v1 := vector.New()
 	v2 := vector.New()
 
-	ForEach(first, last, func(val interface{}) {
+	ForEach(first, last, func(val interface{}) interface{} {
 		if pred(val) {
 			v1.PushBack(val)
 		} else {
 			v2.PushBack(val)
 		}
+		return ""
 	})
 
 	Copy(v1.Begin(), v1.End(), first)
@@ -113,7 +114,7 @@ func PartitionCopy(first, last iterator.InputIterator, resultTrue, resultFalse i
 	t := CloneOutput(resultTrue)
 	f := CloneOutput(resultFalse)
 
-	ForEach(first, last, func(val interface{}) {
+	ForEach(first, last, func(val interface{}) interface{} {
 		if pred(val) {
 			t.SetValue(val)
 			t.Next()
@@ -121,7 +122,7 @@ func PartitionCopy(first, last iterator.InputIterator, resultTrue, resultFalse i
 			f.SetValue(val)
 			f.Next()
 		}
-
+		return ""
 	})
 
 	return resultTrue, resultFalse

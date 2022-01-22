@@ -48,10 +48,7 @@ func MinElement(first, last iterator.RandomAccessIterator, cmp ...comparator.Com
 
 // MaxElement return largest element in range
 func MaxElement(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) (res iterator.RandomAccessIterator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
+	c := comparator.Default(cmp...)
 	return BestElement(first, last, c)
 }
 
@@ -62,9 +59,7 @@ func MaxMinElement(first, last iterator.RandomAccessIterator) (min, max iterator
 
 // Accumulate values in range
 func Accumulate(first, last iterator.RandomAccessIterator, ops ...functional.BinaryOp) interface{} {
-	op := func(x int, y int) int {
-		return x + y
-	}
+	op := functional.Add
 
 	if len(ops) != 0 {
 		op = ops[0]
@@ -81,9 +76,7 @@ func Accumulate(first, last iterator.RandomAccessIterator, ops ...functional.Bin
 
 // AdjacentDifference compute adjacent difference of range
 func AdjacentDifference(first, last iterator.InputIterator, result iterator.OutputIterator, ops ...functional.BinaryOp) iterator.OutputIterator {
-	op := func(x int, y int) int {
-		return x - y
-	}
+	op := functional.Minus
 
 	if len(ops) != 0 {
 		op = ops[0]
@@ -101,12 +94,9 @@ func AdjacentDifference(first, last iterator.InputIterator, result iterator.Outp
 
 // InnerProduct compute cumulative inner product of range
 func InnerProduct(first1, last1, first2 iterator.InputIterator, init int, ops ...functional.BinaryOp) int {
-	op1 := func(x int, y int) int {
-		return x + y
-	}
-	op2 := func(x int, y int) int {
-		return x * y
-	}
+	op1 := functional.Add
+	op2 := functional.Multiplies
+
 	if len(ops) != 0 {
 		op1 = ops[0]
 		op2 = ops[1]
@@ -123,9 +113,7 @@ func InnerProduct(first1, last1, first2 iterator.InputIterator, init int, ops ..
 
 // PartialSum compute partial sums of range
 func PartialSum(first, last iterator.InputIterator, result iterator.OutputIterator, ops ...functional.BinaryOp) iterator.OutputIterator {
-	op := func(x int, y int) int {
-		return x + y
-	}
+	op := functional.Add
 
 	if len(ops) != 0 {
 		op = ops[0]

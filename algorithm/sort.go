@@ -23,11 +23,7 @@ import (
 // 时间复杂度 O(N^2)，空间复杂度 O(1)
 // 不稳定排序
 func selectSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	for i := Clone(first); !i.Equal(last); i.Next() {
 		for j := Next(i); !j.Equal(last); j.Next() {
 			if c.Operator(i.Value(), j.Value()) {
@@ -42,10 +38,7 @@ func selectSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Com
 // 默认稳定排序
 // 重写比较器时，如果相等时不交换，那么就是稳定的，否则不稳定
 func bubbleSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
+	c := comparator.Default(cmp...)
 	cnt := 1
 	isSorted := true
 
@@ -68,11 +61,7 @@ func bubbleSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Com
 // 就是对冒泡排序增加一个方向的冒法
 // 时间复杂度 O(N^2)，空间复杂度 O(1)
 func cocktailSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	cnt := 0
 	mid := Mid(first, last)
 	isSorted := true
@@ -109,22 +98,30 @@ func cocktailSort(first, last iterator.RandomAccessIterator, cmp ...comparator.C
 // 故时间复杂度 O(N^2)，空间复杂度 O(1)
 // 默认稳定排序
 func insertSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
+	c := comparator.Default(cmp...)
 
 	for i := Next(first); !i.Equal(last); i.Next() {
 		j := Pre(i)
 		t := i.Value()
 
-		for j.HasPre() && c.Operator(j.Value(), t) {
+		for j.IsBackEqual(first) && c.Operator(j.Value(), t) {
 			Next(j).SetValue(j.Value())
 			j.Pre()
 		}
 
 		Next(j).SetValue(t)
 	}
+}
+
+// 二分插入排序
+func binaryInsertSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
+	//c := comparator.Default(cmp...)
+	//
+	//for i := Next(first); !i.Equal(last); i.Next() {
+	//	j := Pre(i)
+	//	t := i.Value()
+	//
+	//}
 }
 
 // 希尔排序
@@ -135,11 +132,7 @@ func insertSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Com
 // 时间复杂度 O(nlog^n)，空间复杂度 O(1)
 // 不稳定排序
 func shellSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	l := first.Distance(last)
 
 	// 计算初始增量
@@ -185,48 +178,31 @@ func mergeSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comp
 		return
 	}
 
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
+	c := comparator.Default(cmp...)
 
 	mid := Mid(first, last)
+
 	if first.Distance(last)%2 != 0 {
 		mid.Next()
 	}
+
 	mergeSort(first, Clone(mid), cmp...)
 	mergeSort(Clone(mid), last, cmp...)
 
-	i := Clone(first)
-	j := Clone(mid)
-
-	if c.Operator(j.Value(), Pre(j).Value()) {
+	if c.Operator(first.Value(), Pre(Clone(mid)).Value()) {
 		return
 	}
 
-	tmp := vector.New()
-
-	for !j.Equal(last) && !i.Equal(mid) && !i.Equal(j) {
-		if !c.Operator(i.Value(), j.Value()) {
-			tmp.PushBack(i.Value())
-			i.Next()
-		} else {
-			tmp.PushBack(j.Value())
-			j.Next()
-		}
-	}
-	for !i.Equal(mid) {
-		tmp.PushBack(i.Value())
-		i.Next()
-	}
-	for !j.Equal(last) {
-		tmp.PushBack(j.Value())
-		j.Next()
-	}
-	Copy(tmp.Begin(), tmp.End(), first)
+	InplaceMerge(first, mid, last, cmp...)
 }
 
 func timSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
+	// 个数小于 32，使用插入排序
+	if Distance(first, last) < 32 {
+		insertSort(first, last, cmp...)
+		return
+	}
+
 }
 
 // 猴子排序
@@ -234,11 +210,7 @@ func timSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Compar
 // 复杂度为 O(?)
 // 仅供娱乐
 func bogoSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	isOrder := func() bool {
 		for i := Clone(first); !i.Equal(Pre(last)); i.Next() {
 			if c.Operator(i.Value(), Next(i).Value()) {
@@ -250,8 +222,9 @@ func bogoSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 
 	for !isOrder() {
 		Shuffle(first, last)
-		ForEach(first, last, func(val interface{}) {
+		ForEach(first, last, func(val interface{}) interface{} {
 			fmt.Print(val)
+			return ""
 		})
 		fmt.Println()
 	}
@@ -435,15 +408,12 @@ func heapSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 // 计数排序由于需要额外的桶来存储数据，故通常比较适合于数据分布密集的排序
 // 要保持稳定性，需要对计数数组进行前缀和处理
 func countSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	min, max := MaxMinElement(first, last)
 
 	t := vector.New(vector.WithCapInit(max.Value().(int)-min.Value().(int)+1, 0))
 	j := 0
+
 	for i := Clone(first); !i.Equal(last); i.Next() {
 		index := i.Value().(int) - min.Value().(int)
 		t.SetAt(index, t.At(index).(int)+1)
@@ -462,7 +432,7 @@ func countSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comp
 		}
 	}
 
-	if c.Operator(first.Value(), Next(first)) {
+	if !c.Operator(first.Value(), Next(first).Value()) {
 		Reverse(first, last)
 	}
 }
@@ -499,20 +469,23 @@ func bucketSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Com
 
 	res := Clone(first)
 
-	ForEach(v.Begin(), v.End(), func(val interface{}) {
+	ForEach(v.Begin(), v.End(), func(val interface{}) interface{} {
 		ve := val.(*vector.Vector)
 		if ve.Empty() {
-			return
+			return ""
 		}
 		Sort(ve.Begin(), ve.End(), comparator.NewGreater())
 
-		ForEach(ve.Begin(), ve.End(), func(vv interface{}) {
+		ForEach(ve.Begin(), ve.End(), func(vv interface{}) interface{} {
 			res.SetValue(vv.(int) + min.Value().(int))
 			res.Next()
 			// fmt.Print(vv.(int) + min.Value().(int))
 			// fmt.Print(" ")
+			return ""
 		})
 		// fmt.Println()
+
+		return ""
 	})
 }
 
@@ -532,11 +505,7 @@ func bucketSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Com
 // 同时类似的，比如对时间进行排序，可以按照秒、分钟等来排序
 // 还有对字符串的排序等， 都是其它排序难以做到的，这是基数排序的优势所在
 func radioSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	a, m := MaxMinElement(first, last)
 	min := a.Value().(int)
 	// 预处理，全部变成正数
@@ -568,16 +537,18 @@ func radioSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comp
 
 		out := Clone(first)
 
-		ForEach(bucket.Begin(), bucket.End(), func(val interface{}) {
+		ForEach(bucket.Begin(), bucket.End(), func(val interface{}) interface{} {
 			v := val.(*vector.Vector)
 			if v.Empty() {
-				return
+				return ""
 			}
-			ForEach(v.Begin(), v.End(), func(dd interface{}) {
+			ForEach(v.Begin(), v.End(), func(dd interface{}) interface{} {
 				out.SetValue(dd)
 				out.Next()
+				return ""
 			})
 			v.Clear()
+			return ""
 		})
 	}
 
@@ -595,6 +566,7 @@ func radioSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comp
 // Sort elements in range
 //  [first,last)
 // greater comparator
+// 内审排序
 // 元素较少时使用 shell 排序，数据量较大时使用快排，递归层数太多使用堆排
 // https://feihu.me/blog/2014/sgi-std-sort/
 func Sort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
@@ -605,17 +577,15 @@ func Sort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparato
 }
 
 // StableSort sort elements preserving order of equivalents
+// 使用 tim 排序
 func StableSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	mergeSort(first, last, cmp...)
+	timSort(first, last, cmp...)
+	//mergeSort(first, last, cmp...)
 }
 
 // IsSorted check whether range is sorted
 func IsSorted(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) bool {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	for i := Clone(first); !i.Equal(Pre(last)); i.Next() {
 		if c.Operator(i.Value(), Next(i).Value()) {
 			return false
@@ -627,11 +597,7 @@ func IsSorted(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 
 // IsSortedUntil Find first unsorted element in range
 func IsSortedUntil(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) iterator.RandomAccessIterator {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	for i := Clone(first); !i.Equal(Pre(last)); i.Next() {
 		if c.Operator(i.Value(), Next(i).Value()) {
 			return Next(i)
@@ -651,16 +617,24 @@ func IsSortedUntil(first, last iterator.RandomAccessIterator, cmp ...comparator.
 // The elements are compared using operator< for the first
 // version, and comp for the second.
 func NthElement(first, nth, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
+	c := comparator.Default(cmp...)
+	pivot := doPivot(first, last, c)
+	i, j := partitionTwo(first, last, pivot, c)
 
+	if nth.Equal(i) {
+		return
+	}
+
+	if nth.IsFront(i) {
+		NthElement(first, nth, i, c)
+		return
+	}
+	NthElement(j, nth, last, c)
 }
 
 // PartialSort partially sort elements in range
 func PartialSort(first, middle, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	var c comparator.Comparator = comparator.NewGreater()
-	if len(cmp) != 0 {
-		c = cmp[0]
-	}
-
+	c := comparator.Default(cmp...)
 	MakeHeap(first, middle, comparator.Reserve(c))
 
 	for i := Clone(middle); !i.Equal(last); i.Next() {

@@ -15,7 +15,6 @@ type Comparator interface {
 }
 
 func Reserve(c Comparator) Comparator {
-
 	return New(func(a interface{}, b interface{}) bool {
 		return !c.Operator(a, b)
 	}, WithCmp(func(a interface{}, b interface{}) int {
@@ -23,15 +22,15 @@ func Reserve(c Comparator) Comparator {
 	}))
 }
 
-type Option func(d *Default)
+type Option func(d *DefaultCmp)
 
-type Default struct {
+type DefaultCmp struct {
 	op  Operator
 	cmp Cmp
 }
 
-func New(op Operator, opts ...Option) *Default {
-	d := &Default{
+func New(op Operator, opts ...Option) *DefaultCmp {
+	d := &DefaultCmp{
 		op: op,
 	}
 
@@ -43,22 +42,22 @@ func New(op Operator, opts ...Option) *Default {
 }
 
 func WithOperator(op Operator) Option {
-	return func(d *Default) {
+	return func(d *DefaultCmp) {
 		d.op = op
 	}
 }
 
 func WithCmp(cmp Cmp) Option {
-	return func(d *Default) {
+	return func(d *DefaultCmp) {
 		d.cmp = cmp
 	}
 }
 
-func (d *Default) Operator(a interface{}, b interface{}) bool {
+func (d *DefaultCmp) Operator(a interface{}, b interface{}) bool {
 	return d.op(a, b)
 }
 
-func (d *Default) Cmp(a interface{}, b interface{}) int {
+func (d *DefaultCmp) Cmp(a interface{}, b interface{}) int {
 	return d.cmp(a, b)
 }
 
@@ -361,4 +360,11 @@ func (g *ELess) Operator(a interface{}, b interface{}) bool {
 	default:
 		return false
 	}
+}
+
+func Default(cmp ...Comparator) Comparator {
+	if len(cmp) != 0 {
+		return cmp[0]
+	}
+	return NewGreater()
 }

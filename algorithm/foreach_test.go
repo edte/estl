@@ -6,7 +6,6 @@
 package algorithm
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"stl/iterator"
 	"testing"
@@ -23,20 +22,20 @@ func TestForEach2(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{1, 2, 3, 4, 5}))
 	res := 0
 
-	ForEach(v.Begin(), v.End(), func(val interface{}) {
+	ForEach(v.Begin(), v.End(), func(val interface{}) interface{} {
 		res += val.(int)
+		return ""
 	})
 
-	fmt.Println(res)
+	assert.Equal(t, 15, res)
+
 }
 
-func TestForEachW(t *testing.T) {
+func TestForEachIter(t *testing.T) {
 	v := vector.New(vector.WithData([]interface{}{1, 2, 3, 4, 5}))
-	ForEachW(v.Begin(), v.End(), func(i iterator.ForwardIterator) {
+	ForEachIter(v.Begin(), v.End(), func(i iterator.ForwardIterator) {
 		i.SetValue(23)
 	})
 
 	assert.Equal(t, 23, v.At(0))
-
-	ForEach(v.Begin(), v.End())
 }

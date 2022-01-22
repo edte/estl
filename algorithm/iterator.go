@@ -54,11 +54,11 @@ func End(container containers.Container) iterator.Iterator {
 }
 
 func Pre(it iterator.Iterator) iterator.RandomAccessIterator {
-	return PreB(it).(iterator.RandomAccessIterator)
+	return PreB(it).Clone().(iterator.RandomAccessIterator)
 }
 
 func PreN(it iterator.Iterator, n int) iterator.RandomAccessIterator {
-	return PreBN(it, n).(iterator.RandomAccessIterator)
+	return PreBN(it, n).Clone().(iterator.RandomAccessIterator)
 }
 
 // PreB get iterator to previous element
@@ -72,7 +72,7 @@ func PreBN(it iterator.Iterator, n int) iterator.BidirectionalIterator {
 		it = PreB(it)
 		n--
 	}
-	return it.(iterator.BidirectionalIterator)
+	return it.Clone().(iterator.BidirectionalIterator)
 }
 
 func NextInput(it iterator.Iterator) iterator.InputIterator {
@@ -149,4 +149,8 @@ func IteratorAt(iter iterator.Iterator, n int) iterator.RandomAccessIterator {
 
 func Mid(first, last iterator.RandomAccessIterator) iterator.RandomAccessIterator {
 	return NextN(first, first.Distance(last)/2)
+}
+
+func Position(iter iterator.Iterator) int {
+	return iter.(iterator.RandomAccessIterator).Position()
 }

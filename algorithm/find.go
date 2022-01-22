@@ -45,12 +45,8 @@ func FindIfNot(first, last iterator.InputIterator, pred functional.Pred) iterato
 }
 
 // FindEnd find last subsequence in range
-func FindEnd(first1, last1, first2, last2 iterator.ForwardIterator, pred ...functional.BinaryPred) iterator.ForwardIterator {
-	p := functional.EqualTo
-	if len(pred) != 0 {
-		p = pred[0]
-	}
-
+func FindEnd(first1, last1, first2, last2 iterator.ForwardIterator, preds ...functional.BinaryPred) iterator.ForwardIterator {
+	pred := functional.DefaultBinaryPared(preds...)
 	if first2.Equal(last2) {
 		return last1
 	}
@@ -63,7 +59,7 @@ func FindEnd(first1, last1, first2, last2 iterator.ForwardIterator, pred ...func
 		i1 := CloneBidirectional(i)
 		j1 := CloneBidirectional(j)
 
-		for !i1.Equal(last1) && !j1.Equal(last2) && p(i1.Value(), j1.Value()) {
+		for !i1.Equal(last1) && !j1.Equal(last2) && pred(i1.Value(), j1.Value()) {
 			i1.Next()
 			j1.Next()
 
@@ -84,17 +80,13 @@ func FindEnd(first1, last1, first2, last2 iterator.ForwardIterator, pred ...func
 }
 
 // FindFirstOf find element from set in range
-func FindFirstOf(first1, last1 iterator.InputIterator, first2, last2 iterator.ForwardIterator, pred ...functional.BinaryPred) iterator.InputIterator {
-	p := functional.EqualTo
-	if len(pred) != 0 {
-		p = pred[0]
-	}
-
+func FindFirstOf(first1, last1 iterator.InputIterator, first2, last2 iterator.ForwardIterator, preds ...functional.BinaryPred) iterator.InputIterator {
+	pred := functional.DefaultBinaryPared(preds...)
 	i := CloneInput(first1)
 
 	for !i.Equal(last1) {
 		for j := CloneForward(first2); !j.Equal(last2); j.Next() {
-			if p(i.Value(), j.Value()) {
+			if pred(i.Value(), j.Value()) {
 				return i
 			}
 		}
@@ -104,8 +96,25 @@ func FindFirstOf(first1, last1 iterator.InputIterator, first2, last2 iterator.Fo
 }
 
 // AdjacentFind find equal adjacent elements in range
-func AdjacentFind() {
+func AdjacentFind(first, last iterator.ForwardIterator, preds ...functional.BinaryPred) iterator.ForwardIterator {
+	pred := functional.DefaultBinaryPared(preds...)
 
+	if first.Equal(last) {
+		return last
+	}
+
+	i := CloneForward(first)
+	j := NextForward(first)
+
+	for !i.Equal(j) {
+		if pred(i.Value(), j.Value()) {
+			return i
+		}
+		i.Next()
+		j.Next()
+	}
+
+	return last
 }
 
 // Count appearances of value in range
@@ -135,46 +144,147 @@ func CountIf(first, last iterator.InputIterator, pred functional.Pred) int {
 	return res
 }
 
-// Mismatch return first position where two ranges differ
-func Mismatch(first1, last1, first2 iterator.InputIterator, pred functional.BinaryPred) (iterator.InputIterator, iterator.InputIterator) {
-
-	return nil, nil
-}
-
 // LowerBound return iterator to lower bound
 func LowerBound(first, last iterator.ForwardIterator, val int, cmp ...comparator.Comparator) iterator.ForwardIterator {
+	var c comparator.Comparator = comparator.NewLess()
+	if len(cmp) != 0 {
+		c = cmp[0]
+	}
 
-	return nil
+	distance := Distance(first, last)
+
+	i := CloneForward(first)
+
+	for distance > 0 {
+		it := CloneForward(i)
+		step := distance / 2
+		Advance(it, step)
+
+		if c.Operator(it.Value(), val) {
+			i = NextForward(it)
+			distance -= step + 1
+			continue
+		}
+
+		distance = step
+	}
+
+	return i
 }
 
 // UpperBound return iterator to upper bound
 func UpperBound(first, last iterator.ForwardIterator, val int, cmp ...comparator.Comparator) iterator.ForwardIterator {
+	var c = comparator.Reserve(comparator.NewLess())
+	if len(cmp) != 0 {
+		c = cmp[0]
+	}
 
-	return nil
+	distance := Distance(first, last)
+
+	i := CloneForward(first)
+
+	for distance > 0 {
+		it := CloneForward(i)
+		step := distance / 2
+		Advance(it, step)
+
+		if c.Operator(val, it.Value()) {
+			i = NextForward(it)
+			distance -= step + 1
+			continue
+		}
+
+		distance = step
+	}
+
+	return i
 }
 
 // EqualRange get subrange of equal elements
 func EqualRange(first, last iterator.ForwardIterator, val int, cmp ...comparator.Comparator) (iterator.ForwardIterator, iterator.ForwardIterator) {
+	it := LowerBound(first, last, val)
 
-	return nil, nil
+	return it, UpperBound(it, last, val)
 }
 
 // BinarySearch test if value exists in sorted sequence
 func BinarySearch(first, last iterator.ForwardIterator, val int, cmp ...comparator.Comparator) bool {
-
-	return false
+	it := LowerBound(first, last, val, cmp...)
+	return !it.Equal(last) && functional.EqualTo(val, it.Value())
 }
 
 // Search range for subsequence
-func Search(first1, last1, first2, last2 iterator.ForwardIterator, pred functional.BinaryPred) iterator.ForwardIterator {
+func Search(first1, last1, first2, last2 iterator.ForwardIterator, preds ...functional.BinaryPred) iterator.ForwardIterator {
+	if first2.Equal(last2) {
+		return first1
+	}
 
-	return nil
+	pred := functional.DefaultBinaryPared(preds...)
+
+	i1 := CloneForward(first1)
+	i2 := CloneForward(first2)
+
+	for !i1.Equal(i2) {
+		it1 := CloneForward(i1)
+		it2 := CloneForward(i2)
+
+		for pred(it1.Value(), it2.Value()) {
+			it1.Next()
+			it2.Next()
+			if it2.Equal(last2) {
+				return i1
+			}
+			if it1.Equal(last1) {
+				return last1
+			}
+		}
+		i1.Next()
+	}
+
+	return last1
 }
 
 // SearchN search range for elements
-func SearchN(first, last iterator.ForwardIterator, count, val int, pred functional.BinaryPred) iterator.ForwardIterator {
+// searches the range [first,last) for a sequence of count
+// elements, each comparing equal to val (or for which pred returns
+// true).
+func SearchN(first, last iterator.ForwardIterator, count, val int, preds ...functional.BinaryPred) iterator.ForwardIterator {
+	pred := functional.DefaultBinaryPared(preds...)
 
-	return nil
+	limit := NextN(first, Distance(first, last)-count)
+
+	for i := CloneForward(first); !i.Equal(limit); i.Next() {
+		it := CloneForward(i)
+		j := 0
+
+		for pred(it.Value(), val) {
+			it.Next()
+			j++
+			if j == count {
+				return i
+			}
+		}
+	}
+
+	return last
+}
+
+// Mismatch return first position where two ranges differ
+// compares the elements in the range [first1,last1) with those
+// in the range beginning at first2, and returns the first element
+// of both sequences that does not match.
+func Mismatch(first1, last1, first2 iterator.InputIterator, preds ...functional.BinaryPred) (iterator.InputIterator, iterator.InputIterator) {
+	pred := functional.DefaultBinaryPared(preds...)
+
+	i := CloneInput(first1)
+	j := CloneInput(first2)
+
+	for !i.Equal(last1) && pred(i.Value(), j.Value()) {
+		i.Next()
+		j.Next()
+	}
+
+	return i, j
 }
 
 // Equal test whether the elements in two ranges are equal

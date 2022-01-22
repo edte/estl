@@ -146,8 +146,10 @@ func TestSortHeap(t *testing.T) {
 	SortHeap(v.Begin(), v.End())
 	// fmt.Println(ShowHeap(v.Begin(), v.End()))
 
-	ForEach(v.Begin(), v.End(), func(val interface{}) {
+	ForEach(v.Begin(), v.End(), func(val interface{}) interface{} {
 		fmt.Print(val)
 		fmt.Print(" ")
+
+		return ""
 	})
 }

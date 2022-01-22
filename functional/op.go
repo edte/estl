@@ -6,7 +6,9 @@
 package functional
 
 import (
+	rand "crypto/rand"
 	"fmt"
+	"math/big"
 	"stl/iterator"
 )
 
@@ -27,8 +29,8 @@ var (
 		return -x
 	}
 
-	// Plus 自增
-	Plus Op = func(val interface{}) interface{} {
+	// Increase 自增
+	Increase Op = func(val interface{}) interface{} {
 		i := val.(int)
 		i++
 		return i
@@ -81,7 +83,7 @@ var (
 )
 
 // IterOp 迭代器函数
-type IterOp func(i iterator.Iterator)
+type IterOp func(i iterator.ForwardIterator)
 
 // Pred 一元谓词函数
 type Pred func(i interface{}) bool
@@ -162,6 +164,13 @@ var (
 	}
 )
 
+func DefaultBinaryPared(preds ...BinaryPred) BinaryPred {
+	if len(preds) != 0 {
+		return preds[0]
+	}
+	return EqualTo
+}
+
 // Not1 return negation of unary function object
 func Not1(pred Pred) Pred {
 	return func(i interface{}) bool {
@@ -175,3 +184,30 @@ func Not2(pred BinaryPred) BinaryPred {
 		return !pred(x, y)
 	}
 }
+
+// IGenerator 数据产生器
+type IGenerator interface {
+	Gen() interface{}
+}
+
+type gen struct {
+	size int
+	Generator
+}
+
+func newGen(size int) *gen {
+	return &gen{size: size}
+}
+
+func (g *gen) Gen() interface{} {
+	return g.Generator()
+}
+
+type Generator func() interface{}
+
+var (
+	RandomNum Generator = func() interface{} {
+		n, _ := rand.Int(rand.Reader, big.NewInt(100))
+		return n
+	}
+)
