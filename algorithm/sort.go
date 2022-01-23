@@ -8,6 +8,7 @@ package algorithm
 import (
 	"fmt"
 	"math"
+	"stl/containers/stack"
 	"sync"
 	"time"
 
@@ -196,13 +197,50 @@ func mergeSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comp
 	InplaceMerge(first, mid, last, cmp...)
 }
 
+// https://svn.python.org/projects/python/trunk/Objects/listsort.txt
 func timSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
 	// 个数小于 32，使用插入排序
 	if Distance(first, last) < 32 {
-		insertSort(first, last, cmp...)
+		binaryInsertSort(first, last, cmp...)
 		return
 	}
 
+	c := comparator.Default(cmp...)
+
+	s := stack.New()
+
+	i := Clone(first)
+
+	isGreater := true
+
+	//min := minRunLength(Distance(first, last))
+
+	for j := Next(first); !j.Equal(last); j.Next() {
+		if isGreater && c.Operator(Pre(j).Value(), j.Value()) {
+			s.Push(MakePair(i, j))
+			i = Clone(j)
+			isGreater = false
+			continue
+		}
+
+		if !isGreater && !c.Operator(Pre(j).Value(), j.Value()) {
+			Reverse(i, j)
+			s.Push(MakePair(i, j))
+			i = Clone(j)
+			isGreater = true
+		}
+	}
+}
+
+func minRunLength(n int) int {
+	// 如果低位任何一位是1，就会变成1
+	r := 0
+	// 改成了64
+	for n >= 64 {
+		r |= (n & 1)
+		n >>= 1
+	}
+	return n + r
 }
 
 // 猴子排序

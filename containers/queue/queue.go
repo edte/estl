@@ -5,54 +5,25 @@
 // @description:
 package queue
 
-// FIFO queue
-// queues are a type of container adaptor, specifically
-// designed to operate in a FIFO context (first-in first-out),
-// where elements are inserted into one end of the container
-// and extracted from the other.
-//
-// queues are implemented as containers adaptors, which are
-// classes that use an encapsulated object of a specific
-// container class as its underlying container, providing
-// a specific set of member functions to access its elements.
-// Elements are pushed into the "back" of the specific
-// container and popped from its "front".
-//
-// The underlying container may be one of the standard
-// container class template or some other specifically
-// designed container class. This underlying container shall
-// support at least the following operations:
-// empty
-// size
-// front
-// back
-// push_back
-// pop_front
-//
-// The standard container classes deque and list fulfill
-// these requirements. By default, if no container class is
-// specified for a particular queue class instantiation,
-// the standard container deque is used.
-
-type queue interface {
-	Empty() bool
-	Size() int
-	Front() interface{}
-	Back() interface{}
-	Push(v interface{})
-	Emplace(v interface{})
-	Pop()
-	Swap(t *Queue)
-}
+import (
+	"stl/allocator"
+	"stl/containers"
+	"stl/containers/deque"
+	"stl/locker"
+)
 
 type Option func(*Queue)
 
 type Queue struct {
-	data []interface{}
+	container containers.SequentialContainer
+	locker    locker.Locker
 }
 
 func New(opts ...Option) *Queue {
-	q := &Queue{}
+	q := &Queue{
+		container: deque.New(),
+		locker:    nil,
+	}
 
 	for _, opt := range opts {
 		opt(q)
@@ -61,44 +32,64 @@ func New(opts ...Option) *Queue {
 	return q
 }
 
-// Empty test whether container is empty
-func (q *Queue) Empty() bool {
-	return q.Size() == 0
+func WithGoroutineSafe(l locker.Locker) Option {
+	return func(q *Queue) {
+		q.locker = l
+	}
 }
 
-// Size return size
+func (q *Queue) Swap(t *containers.Container) {
+	q.Swap(t)
+}
+
+func (q *Queue) Clone() containers.Container {
+	return q.container.Clone()
+}
+
+func (q *Queue) Clear() {
+	q.container.Clear()
+}
+
 func (q *Queue) Size() int {
-	return len(q.data)
+	return q.container.Size()
 }
 
-// Front access next element
-func (q *Queue) Front() interface{} {
-	return q.data[0]
+func (q *Queue) MaxSize() int {
+	return q.container.MaxSize()
 }
 
-// Back access last element
-func (q *Queue) Back() interface{} {
-	return q.data[q.Size()-1]
+func (q *Queue) Capacity() int {
+	return q.container.Capacity()
 }
 
-// Push insert element
+func (q *Queue) Empty() bool {
+	return q.container.Empty()
+}
+
+func (q *Queue) GetAllocator() allocator.Allocator {
+	return q.container.GetAllocator()
+}
+
+func (q *Queue) Construct() {
+	q.container.Construct()
+}
+
+func (q *Queue) Destroy() {
+	q.container.Destroy()
+}
+
+func (q *Queue) String() string {
+	return q.container.String()
+}
+
 func (q *Queue) Push(v interface{}) {
-	q.data = append(q.data, v)
+	q.container.PushBack(v)
 }
 
-// Emplace construct and insert element
 func (q *Queue) Emplace(v interface{}) {
-	q.Push(v)
+	q.container.EmplaceBack(v)
 }
 
-// Pop remove next element
 func (q *Queue) Pop() {
-	q.data = q.data[1:]
-}
-
-// Swap contents
-func (q *Queue) Swap(t *Queue) {
-	tmp := t.data
-	t.data = q.data
-	q.data = tmp
+	q.container.PopBack()
 }

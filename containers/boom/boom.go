@@ -10,14 +10,6 @@ import (
 	"stl/containers/bitset"
 )
 
-type boom interface {
-	Empty() bool
-	Size() int
-	Insert(key []byte)
-	Contains(key []byte) bool
-	Clear()
-}
-
 const (
 	defaultHashNum = 14
 )

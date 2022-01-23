@@ -7,8 +7,9 @@ package vector
 
 import (
 	"fmt"
-
+	"stl/allocator"
 	"stl/comparator"
+	"stl/containers"
 	"stl/iterator"
 	"stl/locker"
 )
@@ -51,17 +52,27 @@ type Vector struct {
 	locker locker.Locker
 }
 
-func (v *Vector) Len() int {
-	return len(v.data)
+func (v *Vector) CREnd() iterator.RandomAccessIterator {
+	//TODO implement me
+	panic("implement me")
 }
 
-func (v *Vector) Less(i, j int) bool {
-	return v.data[i].(int) < v.data[j].(int)
+func (v *Vector) PopFront() {
+	//TODO implement me
+	panic("implement me")
 }
 
-func (v *Vector) Swap(i, j int) {
-	v.data[i], v.data[j] = v.data[j], v.data[i]
-}
+//func (v *Vector) Len() int {
+//	return len(v.data)
+//}
+//
+//func (v *Vector) Less(i, j int) bool {
+//	return v.data[i].(int) < v.data[j].(int)
+//}
+//
+//func (v *Vector) Swap(i, j int) {
+//	v.data[i], v.data[j] = v.data[j], v.data[i]
+//}
 
 // New Construct
 func New(opts ...Option) *Vector {
@@ -354,14 +365,6 @@ func (v *Vector) EraseIter(first iterator.RandomAccessIterator, last iterator.Ra
 	return NewIterator(v, l)
 }
 
-/*// Swap content
-func (v *Vector) Swap(n *Vector) {
-	t := v.data
-	v.data = n.data
-	n.data = t
-}
-*/
-
 // Clear content
 func (v *Vector) Clear() {
 	v.data = v.data[:0]
@@ -385,6 +388,44 @@ func (v *Vector) String() string {
 	return res
 }
 
-func (v *Vector) Clone() *Vector {
+func (v *Vector) Clone() containers.Container {
 	return New(WithVector(v))
+}
+
+func (v *Vector) GetAllocator() allocator.Allocator {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (v *Vector) Construct() {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (v *Vector) Destroy() {
+	//TODO implement me
+	panic("implement me")
+}
+
+// Swap content
+func (v *Vector) Swap(t *containers.Container) {
+	n := (*t).(*Vector)
+	tt := v.data
+	v.data = n.data
+	n.data = tt
+}
+
+func (v *Vector) CBegin() iterator.RandomAccessIterator {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (v *Vector) CEnd() iterator.RandomAccessIterator {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (v *Vector) CRBegin() iterator.RandomAccessIterator {
+	//TODO implement me
+	panic("implement me")
 }

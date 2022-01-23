@@ -1,9 +1,9 @@
 // @program:     tiny-stl
-// @file:        heap_test.go.go
+// @file:        priority_queue_test.go.go
 // @author:      edte
 // @create:      2022-01-16 00:14
 // @description:
-package heap
+package priorityqueue
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ func TestHeap_Emplace(t *testing.T) {
 
 	fmt.Println(h)
 
-	fmt.Println(algorithm.IsHeap(h.data.Begin(), h.data.End()))
+	fmt.Println(algorithm.IsHeap(h.container.Begin(), h.container.End()))
 }
 
 func TestHeap_Empty(t *testing.T) {
@@ -69,12 +69,12 @@ func TestHeap_Size(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &Heap{
-				data:   tt.fields.data,
-				cmp:    tt.fields.cmp,
-				locker: tt.fields.locker,
-				safe:   tt.fields.safe,
-				state:  tt.fields.state,
+			h := &PriorityQueue{
+				container: tt.fields.data,
+				cmp:       tt.fields.cmp,
+				locker:    tt.fields.locker,
+				safe:      tt.fields.safe,
+				state:     tt.fields.state,
 			}
 			if got := h.Size(); got != tt.want {
 				t.Errorf("Size() = %v, want %v", got, tt.want)
@@ -114,12 +114,12 @@ func TestHeap_Top(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &Heap{
-				data:   tt.fields.data,
-				cmp:    tt.fields.cmp,
-				locker: tt.fields.locker,
-				safe:   tt.fields.safe,
-				state:  tt.fields.state,
+			h := &PriorityQueue{
+				container: tt.fields.data,
+				cmp:       tt.fields.cmp,
+				locker:    tt.fields.locker,
+				safe:      tt.fields.safe,
+				state:     tt.fields.state,
 			}
 			if got := h.Top(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Top() = %v, want %v", got, tt.want)
@@ -135,7 +135,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *Heap
+		want *PriorityQueue
 	}{
 		// TODO: Add test cases.
 	}

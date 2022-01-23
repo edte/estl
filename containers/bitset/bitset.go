@@ -26,27 +26,6 @@ import (
 //The size of a bitset is fixed at compile-time (determined by its template parameter).
 //For a class that also optimizes for space allocation and allows for dynamic resizing, see the bool specialization of vector (vector<bool>).
 
-type bitSet interface {
-	// bit access
-	Count() uint
-	Size() uint
-	Test(uint) bool
-	Any() bool
-	None() bool
-	All() bool
-
-	// bit operations
-	Set(uint)
-	UnSet(uint)
-	Clear(uint)
-	Flip(uint)
-
-	// bitset operations
-	ToUint64() uint64
-	ToUint32() uint32
-	ToString() string
-}
-
 type BitSet struct {
 	size uint
 	data []byte

@@ -1,5 +1,5 @@
 // @program:     tiny-stl
-// @file:        heap.go
+// @file:        priorityqueue.go
 // @author:      edte
 // @create:      2022-01-02 22:40
 // @description:
@@ -14,7 +14,7 @@ import (
 	"stl/iterator"
 )
 
-// PushHeap push element into heap range
+// PushHeap push element into priorityqueue range
 func PushHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
 	c := comparator.Default(cmp...)
 	siftUp(first, last.Clone().(iterator.RandomAccessIterator).Pre().(iterator.RandomAccessIterator), c)
@@ -116,14 +116,14 @@ func getFirstLeaf(first, last iterator.RandomAccessIterator) iterator.RandomAcce
 	return first.Clone().(iterator.RandomAccessIterator).IteratorAt(index)
 }
 
-// PopHeap pop element from heap range
+// PopHeap pop element from priorityqueue range
 func PopHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
 	c := comparator.Default(cmp...)
 	Swap(first, last.Clone().(iterator.RandomAccessIterator).Pre())
 	siftDown(first, last.Clone().(iterator.RandomAccessIterator).Pre().(iterator.RandomAccessIterator), first, c)
 }
 
-// MakeHeap make heap from range
+// MakeHeap make priorityqueue from range
 func MakeHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
 	c := comparator.Default(cmp...)
 	leaf := getLastNotLeaf(first, last)
@@ -136,7 +136,7 @@ func MakeHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 	}
 }
 
-// SortHeap selectSort elements of heap
+// SortHeap selectSort elements of priorityqueue
 // 要使用堆排，必须已经是一个堆才行
 func SortHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
 	c := comparator.Default(cmp...)
@@ -153,7 +153,7 @@ func SortHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Compa
 	Reverse(first, last)
 }
 
-// IsHeap test if range is heap
+// IsHeap test if range is priorityqueue
 func IsHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) bool {
 	c := comparator.Default(cmp...)
 	q := queue.New()
@@ -182,7 +182,7 @@ func IsHeap(first, last iterator.RandomAccessIterator, cmp ...comparator.Compara
 	return true
 }
 
-// IsHeapUntil find first element not in heap order
+// IsHeapUntil find first element not in priorityqueue order
 func IsHeapUntil(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) iterator.RandomAccessIterator {
 	c := comparator.Default(cmp...)
 	q := queue.New()

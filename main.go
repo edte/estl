@@ -5,14 +5,5 @@
 // @description:
 package main
 
-import (
-	"stl/algorithm"
-	"stl/containers/vector"
-)
-
 func main() {
-	v := vector.New()
-	v.PushBack(23)
-	v.PushBack(3)
-	algorithm.ForEach(v.Begin(), v.End())
 }
