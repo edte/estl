@@ -145,7 +145,7 @@ func CountIf(first, last iterator.InputIterator, pred functional.Pred) int {
 }
 
 // LowerBound return iterator to lower bound
-func LowerBound(first, last iterator.ForwardIterator, val int, cmp ...comparator.Comparator) iterator.ForwardIterator {
+func LowerBound(first, last iterator.ForwardIterator, val interface{}, cmp ...comparator.Comparator) iterator.ForwardIterator {
 	var c comparator.Comparator = comparator.NewLess()
 	if len(cmp) != 0 {
 		c = cmp[0]
@@ -173,7 +173,7 @@ func LowerBound(first, last iterator.ForwardIterator, val int, cmp ...comparator
 }
 
 // UpperBound return iterator to upper bound
-func UpperBound(first, last iterator.ForwardIterator, val int, cmp ...comparator.Comparator) iterator.ForwardIterator {
+func UpperBound(first, last iterator.ForwardIterator, val interface{}, cmp ...comparator.Comparator) iterator.ForwardIterator {
 	var c = comparator.Reserve(comparator.NewLess())
 	if len(cmp) != 0 {
 		c = cmp[0]
@@ -201,10 +201,10 @@ func UpperBound(first, last iterator.ForwardIterator, val int, cmp ...comparator
 }
 
 // EqualRange get subrange of equal elements
-func EqualRange(first, last iterator.ForwardIterator, val int, cmp ...comparator.Comparator) (iterator.ForwardIterator, iterator.ForwardIterator) {
-	it := LowerBound(first, last, val)
+func EqualRange(first, last iterator.ForwardIterator, val interface{}, cmp ...comparator.Comparator) (iterator.ForwardIterator, iterator.ForwardIterator) {
+	it := LowerBound(first, last, val, cmp...)
 
-	return it, UpperBound(it, last, val)
+	return it, UpperBound(it, last, val, cmp...)
 }
 
 // BinarySearch test if value exists in sorted sequence

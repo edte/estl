@@ -6,7 +6,7 @@
 package queue
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -16,14 +16,9 @@ func TestNew(t *testing.T) {
 	q.Push(2)
 	q.Push(3)
 	q.Push(4)
-	fmt.Println(q.Front())
+	assert.Equal(t, 1, q.Front())
+	assert.Equal(t, 4, q.Back())
 	q.Pop()
-	fmt.Println(q.Front())
-	q.Pop()
-	fmt.Println(q.Front())
-	q.Pop()
-	fmt.Println(q.Front())
-	q.Pop()
-
-	fmt.Println(q.Empty())
+	assert.Equal(t, 2, q.Front())
+	assert.Equal(t, 4, q.Back())
 }

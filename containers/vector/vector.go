@@ -52,16 +52,6 @@ type Vector struct {
 	locker locker.Locker
 }
 
-func (v *Vector) CREnd() iterator.RandomAccessIterator {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (v *Vector) PopFront() {
-	//TODO implement me
-	panic("implement me")
-}
-
 //func (v *Vector) Len() int {
 //	return len(v.data)
 //}
@@ -428,4 +418,13 @@ func (v *Vector) CEnd() iterator.RandomAccessIterator {
 func (v *Vector) CRBegin() iterator.RandomAccessIterator {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (v *Vector) CREnd() iterator.RandomAccessIterator {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (v *Vector) PopFront() {
+	v.data = v.data[1:]
 }

@@ -8,7 +8,9 @@ package algorithm
 import (
 	"fmt"
 	"math"
+	"stl/containers/pair"
 	"stl/containers/stack"
+	"stl/functional"
 	"sync"
 	"time"
 
@@ -16,6 +18,11 @@ import (
 	"stl/containers/vector"
 	"stl/iterator"
 )
+
+// https://www.sakuratears.top/blog/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%EF%BC%88%E4%BA%94%EF%BC%89-%E5%8F%8C%E8%B0%83%E6%8E%92%E5%BA%8F.html
+// https://www.sakuratears.top/blog/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%EF%BC%88%E5%9B%9B%EF%BC%89.html#%E6%A0%91%E5%BD%A2%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F%EF%BC%88TreeSelectionSort%EF%BC%89
+// https://www.sakuratears.top/blog/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%89%EF%BC%89.html
+// https://www.sakuratears.top/blog/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%EF%BC%88%E4%BA%8C%EF%BC%89.html#%E6%8A%98%E5%8D%8A%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%EF%BC%88BinaryInsertionSort%EF%BC%89
 
 // 随机访问迭代器的排序实现
 // 主要是数组的排序
@@ -32,6 +39,23 @@ func selectSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Com
 			}
 		}
 	}
+}
+
+// 锦标赛排序，也称为树形选择排序
+// 选择排序的优化
+// 普通的选择排序中，每次都是从余下的数中选取最值，而这个选择的过程是 O(n) 的
+// 但是实际上，我们可以利用上一次选择的中间值，用空间暂存上一次两两比较的结果
+// 去出掉上一次最值的比较，余下的那些都是可以使用的，可以直接用在这一轮中
+// 而这个过程则是 O(log^n) 的
+// 原理就是对每一轮的比较过程建树，从下往上建，最后根节点就是这一轮的最值
+// 而下一轮只需更新上一轮这颗树的一些部分节点即可
+// 树的高度就是这一轮的时间复杂度
+// 类似于堆，用数组建满二叉树，每次取根节点，而且要调整
+// 也类似于 B 树，huffman 树的的建立过程，值存在叶子节点中，而且建树方式是从下往上
+// 建
+// 不稳定
+func tournamentSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
+
 }
 
 // bubbleSort 冒泡排序
@@ -116,13 +140,26 @@ func insertSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Com
 
 // 二分插入排序
 func binaryInsertSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	//c := comparator.Default(cmp...)
-	//
-	//for i := Next(first); !i.Equal(last); i.Next() {
-	//	j := Pre(i)
-	//	t := i.Value()
-	//
-	//}
+	for i := Next(first); i.IsFrontEqual(last); i.Next() {
+		insert(first, i, cmp...)
+	}
+}
+
+// [first,last-1] 是有序的，将 last 插入到前面去
+func insert(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
+	if Distance(first, last) <= 1 {
+		return
+	}
+
+	pos := UpperBound(first, Pre(last), Pre(last).Value(), cmp...).(iterator.RandomAccessIterator)
+
+	t := Pre(last).Value()
+
+	for j := Pre(last); j.IsBack(pos); j.Pre() {
+		j.SetValue(Pre(j).Value())
+	}
+
+	pos.SetValue(t)
 }
 
 // 希尔排序
@@ -197,10 +234,28 @@ func mergeSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comp
 	InplaceMerge(first, mid, last, cmp...)
 }
 
+const (
+	minMerge = 32
+)
+
 // https://svn.python.org/projects/python/trunk/Objects/listsort.txt
+// https://www.sakuratears.top/blog/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%EF%BC%88%E5%85%AD%EF%BC%89-TimSort.html
+// timSort，利用数据的有序特性，进行多次 merge 操作
+// 稳定，而且最坏复杂度也是 O(log^n)
+// 时间复杂度 O(log^n)，空间复杂度 O(n)
+// 获取有序序列，称为 run，逆序的反转
+// 每次获取一个 run，并且要大于 minRunLength，不够则二分插入
+// 获取 run 之后 push 到栈里面，然后看栈顶的几个 run 是否满足 merge 条件
+// 满足就 merge，否则继续获取下一个 run
+// 最后再强制把所有 run 合并一遍
 func timSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
-	// 个数小于 32，使用插入排序
-	if Distance(first, last) < 32 {
+	// 小于 2，不用排序
+	if Distance(first, last) < 2 {
+		return
+	}
+
+	// 个数小于 minMerge，使用二分插入排序
+	if Distance(first, last) < minMerge {
 		binaryInsertSort(first, last, cmp...)
 		return
 	}
@@ -209,38 +264,160 @@ func timSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Compar
 
 	s := stack.New()
 
-	i := Clone(first)
+	l := Clone(first)
 
-	isGreater := true
+	min := minRunLength(Distance(first, last))
 
-	//min := minRunLength(Distance(first, last))
-
-	for j := Next(first); !j.Equal(last); j.Next() {
-		if isGreater && c.Operator(Pre(j).Value(), j.Value()) {
-			s.Push(MakePair(i, j))
-			i = Clone(j)
-			isGreater = false
-			continue
+	for r := Clone(first); !r.Equal(last); {
+		length := getOrderlyLength(l, last)
+		r = NextN(l, length)
+		if length > 1 && c.Operator(l.Value(), Pre(r).Value()) {
+			Reverse(l, r)
 		}
 
-		if !isGreater && !c.Operator(Pre(j).Value(), j.Value()) {
-			Reverse(i, j)
-			s.Push(MakePair(i, j))
-			i = Clone(j)
-			isGreater = true
+		for length < min {
+			if r.Equal(last) {
+				break
+			}
+			r.Next()
+			insert(l, r, c)
+			length++
 		}
+
+		s.Push(MakePair(l, r))
+
+		l = r
+
+		mergeCollapse(s, cmp...)
 	}
+
+	mergeForce(s, cmp...)
 }
 
+// minRun 长度
+// 根据元素个数 n
+// 如果 n 小于 minMerge，则 minRun=n
+// 如果 n 是 2 的幂，则 n=minMerge/2
+// 否则返回 k，使得 minMerge/2 <= k <= minMerge,且 n/k <= 2 的幂
 func minRunLength(n int) int {
-	// 如果低位任何一位是1，就会变成1
 	r := 0
-	// 改成了64
-	for n >= 64 {
-		r |= (n & 1)
+	for n >= minMerge {
+		r |= n & 1
 		n >>= 1
 	}
 	return n + r
+}
+
+// 获取有序部分长度
+func getOrderlyLength(first, last iterator.RandomAccessIterator) int {
+	distance := Distance(first, last)
+	if distance < 2 {
+		return distance
+	}
+
+	l1 := 1
+	l2 := 1
+
+	for i := Next(first); !i.Equal(last); i.Next() {
+		if functional.Less(Pre(i).Value(), i.Value()) {
+			l1++
+		} else {
+			break
+		}
+	}
+	for i := Next(first); !i.Equal(last); i.Next() {
+		if functional.Greater(Pre(i).Value(), i.Value()) {
+			l2++
+		} else {
+			break
+		}
+	}
+
+	return Max(l1, l2).(int)
+}
+
+// 栈顶若满足一定条件，则合并
+// 最终的要满足的是，从左到右的 run 长度减半，这样 merge 效率才高
+// 故，假设有 A，B，C 三个 run
+// 如果 B<=C ，则合并 B，C
+// 如果 A<=B+C，且 A,B 两个 run 的长度比 B，C 两个 run 的长度更短，则合并 A，B
+// 否则合并 B，C
+func mergeCollapse(s *stack.Stack, cmp ...comparator.Comparator) {
+	if s.Size() < 2 {
+		return
+	}
+
+	for s.Size() > 1 {
+		c := s.Top().(*pair.Pair)
+		s.Pop()
+		b := s.Top().(*pair.Pair)
+		s.Pop()
+
+		cFirst := c.First().(iterator.RandomAccessIterator)
+		cSecond := c.Second().(iterator.RandomAccessIterator)
+		distanceC := Distance(cFirst, cSecond)
+
+		bFirst := b.First().(iterator.RandomAccessIterator)
+		bSecond := b.Second().(iterator.RandomAccessIterator)
+		distanceB := Distance(bFirst, bSecond)
+
+		if distanceB <= distanceC {
+			InplaceMerge(bFirst, bSecond, cSecond, cmp...)
+			s.Push(MakePair(bFirst, cSecond))
+			continue
+		}
+
+		if s.Empty() {
+			s.Push(b)
+			s.Push(c)
+			break
+		}
+
+		a := s.Top().(*pair.Pair)
+		s.Pop()
+		aFirst := a.First().(iterator.RandomAccessIterator)
+		aSecond := a.Second().(iterator.RandomAccessIterator)
+		distanceA := Distance(aFirst, aSecond)
+
+		if distanceA <= distanceB+distanceC {
+			if distanceA+distanceB < distanceB+distanceC {
+				InplaceMerge(aFirst, aSecond, bSecond, cmp...)
+				s.Push(MakePair(aFirst, bSecond))
+				s.Push(c)
+			} else {
+				InplaceMerge(bFirst, bSecond, cSecond, cmp...)
+				s.Push(a)
+				s.Push(MakePair(bFirst, cSecond))
+			}
+			continue
+		}
+
+		s.Push(a)
+		s.Push(b)
+		s.Push(c)
+		break
+	}
+}
+
+// 最后堆栈中所有进行强制排序
+func mergeForce(s *stack.Stack, cmp ...comparator.Comparator) {
+	if s.Size() < 2 {
+		return
+	}
+
+	for s.Size() > 1 {
+		c := s.Top().(*pair.Pair)
+		s.Pop()
+		b := s.Top().(*pair.Pair)
+		s.Pop()
+
+		cSecond := c.Second().(iterator.RandomAccessIterator)
+		bFirst := b.First().(iterator.RandomAccessIterator)
+		bSecond := b.Second().(iterator.RandomAccessIterator)
+
+		InplaceMerge(bFirst, bSecond, cSecond, cmp...)
+		s.Push(MakePair(bFirst, cSecond))
+	}
 }
 
 // 猴子排序
@@ -318,10 +495,6 @@ func sleepSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comp
 func quickSort(first, last iterator.RandomAccessIterator, depth int, cmp ...comparator.Comparator) {
 	depth--
 
-	if depth == 0 {
-		heapSort(first, last, cmp...)
-	}
-
 	// 结束递归
 	if first.Distance(last) <= 1 {
 		return
@@ -330,6 +503,10 @@ func quickSort(first, last iterator.RandomAccessIterator, depth int, cmp ...comp
 	// 如果已经排序，则返回
 	if IsSorted(first, last, cmp...) {
 		return
+	}
+
+	if depth == 0 {
+		heapSort(first, last, cmp...)
 	}
 
 	var c comparator.Comparator = comparator.NewEGreater()
@@ -618,7 +795,17 @@ func Sort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparato
 // 使用 tim 排序
 func StableSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
 	timSort(first, last, cmp...)
-	//mergeSort(first, last, cmp...)
+}
+
+// 全排序排序
+// 列举所有全排序，直到找到有序序列
+// 时间复杂度 O(n!)，空间复杂度 O(1)
+func permutationSort(first, last iterator.RandomAccessIterator, cmp ...comparator.Comparator) {
+	for !IsSorted(first, last, cmp...) {
+		//ForEach(first, last)
+		//fmt.Println()
+		NextPermutation(first, last, cmp...)
+	}
 }
 
 // IsSorted check whether range is sorted

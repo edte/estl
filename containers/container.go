@@ -33,15 +33,6 @@ type Container interface {
 type SequentialContainer interface {
 	Container
 
-	Begin() iterator.RandomAccessIterator
-	End() iterator.RandomAccessIterator
-	RBegin() iterator.RandomAccessIterator
-	REnd() iterator.RandomAccessIterator
-	CBegin() iterator.RandomAccessIterator
-	CEnd() iterator.RandomAccessIterator
-	CRBegin() iterator.RandomAccessIterator
-	CREnd() iterator.RandomAccessIterator
-
 	ReSize(size int, value ...int)
 
 	Reserve(n int)
@@ -72,10 +63,28 @@ type SequentialContainer interface {
 }
 
 type Vector interface {
+	Begin() iterator.RandomAccessIterator
+	End() iterator.RandomAccessIterator
+	RBegin() iterator.RandomAccessIterator
+	REnd() iterator.RandomAccessIterator
+	CBegin() iterator.RandomAccessIterator
+	CEnd() iterator.RandomAccessIterator
+	CRBegin() iterator.RandomAccessIterator
+	CREnd() iterator.RandomAccessIterator
+
 	SequentialContainer
 }
 
 type List interface {
+	Begin() iterator.BidirectionalIterator
+	End() iterator.BidirectionalIterator
+	RBegin() iterator.BidirectionalIterator
+	REnd() iterator.BidirectionalIterator
+	CBegin() iterator.BidirectionalIterator
+	CEnd() iterator.BidirectionalIterator
+	CRBegin() iterator.BidirectionalIterator
+	CREnd() iterator.BidirectionalIterator
+
 	SequentialContainer
 	Reserve(n int)
 	Slice()
@@ -87,14 +96,48 @@ type List interface {
 }
 
 type ForwardList interface {
-	List
+	SequentialContainer
+	Reserve(n int)
+	Slice()
+	Remove()
+	RemoveIf()
+	Unique()
+	Merge()
+	Sort()
+
+	Begin() iterator.ForwardIterator
+	End() iterator.ForwardIterator
+	RBegin() iterator.ForwardIterator
+	REnd() iterator.ForwardIterator
+	CBegin() iterator.ForwardIterator
+	CEnd() iterator.ForwardIterator
+	CRBegin() iterator.ForwardIterator
+	CREnd() iterator.ForwardIterator
 }
 
 type Deque interface {
+	Begin() iterator.RandomAccessIterator
+	End() iterator.RandomAccessIterator
+	RBegin() iterator.RandomAccessIterator
+	REnd() iterator.RandomAccessIterator
+	CBegin() iterator.RandomAccessIterator
+	CEnd() iterator.RandomAccessIterator
+	CRBegin() iterator.RandomAccessIterator
+	CREnd() iterator.RandomAccessIterator
+
 	SequentialContainer
 }
 
 type String interface {
+	Begin() iterator.RandomAccessIterator
+	End() iterator.RandomAccessIterator
+	RBegin() iterator.RandomAccessIterator
+	REnd() iterator.RandomAccessIterator
+	CBegin() iterator.RandomAccessIterator
+	CEnd() iterator.RandomAccessIterator
+	CRBegin() iterator.RandomAccessIterator
+	CREnd() iterator.RandomAccessIterator
+
 	SequentialContainer
 }
 
@@ -222,8 +265,8 @@ type Stack interface {
 
 type Queue interface {
 	ContainerAdapter
-	Front()
-	Back()
+	Front() interface{}
+	Back() interface{}
 }
 
 type PriorityQueue interface {

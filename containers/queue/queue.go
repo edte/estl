@@ -8,7 +8,7 @@ package queue
 import (
 	"stl/allocator"
 	"stl/containers"
-	"stl/containers/deque"
+	"stl/containers/vector"
 	"stl/locker"
 )
 
@@ -21,7 +21,7 @@ type Queue struct {
 
 func New(opts ...Option) *Queue {
 	q := &Queue{
-		container: deque.New(),
+		container: vector.New(),
 		locker:    nil,
 	}
 
@@ -91,5 +91,13 @@ func (q *Queue) Emplace(v interface{}) {
 }
 
 func (q *Queue) Pop() {
-	q.container.PopBack()
+	q.container.PopFront()
+}
+
+func (q *Queue) Front() interface{} {
+	return q.container.Front()
+}
+
+func (q *Queue) Back() interface{} {
+	return q.container.Back()
 }

@@ -13,12 +13,28 @@ import (
 
 // Max return the largest
 func Max(data ...interface{}) interface{} {
-	return data[0]
+	res := data[0]
+
+	for _, d := range data {
+		if comparator.NewLess().Operator(res, d) {
+			res = d
+		}
+	}
+
+	return res
 }
 
 // Min return the smallest
 func Min(data ...interface{}) interface{} {
-	return data[0]
+	res := data[0]
+
+	for _, d := range data {
+		if comparator.NewGreater().Operator(res, d) {
+			res = d
+		}
+	}
+
+	return res
 }
 
 // MaxMin return smallest and largest elements

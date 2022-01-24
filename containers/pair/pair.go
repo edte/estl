@@ -16,3 +16,11 @@ func New(first, second interface{}) *Pair {
 		second: second,
 	}
 }
+
+func (p *Pair) First() interface{} {
+	return p.first
+}
+
+func (p *Pair) Second() interface{} {
+	return p.second
+}

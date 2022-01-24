@@ -21,9 +21,9 @@ func NewIterator(data *Vector, pos int) *Iterator {
 }
 
 func (iter *Iterator) Next() iterator.Iterator {
-	if iter.pos == iter.data.Size() {
-		return iter
-	}
+	//if iter.pos == iter.data.Size() {
+	//	return iter
+	//}
 	iter.pos++
 	return iter
 }

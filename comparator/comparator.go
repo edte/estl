@@ -294,7 +294,84 @@ type Less struct {
 }
 
 func (g *Less) Cmp(a interface{}, b interface{}) int {
-	panic("implement me")
+	if a == b {
+		return 0
+	}
+
+	switch a.(type) {
+	case int:
+		if a.(int) > b.(int) {
+			return -1
+		} else if a.(int) == b.(int) {
+			return 0
+		} else {
+			return 1
+		}
+	case int64:
+		if a.(int64) > b.(int64) {
+			return -1
+		} else if a.(int64) == b.(int64) {
+			return 0
+		} else {
+			return 1
+		}
+	case int32:
+		if a.(int32) > b.(int32) {
+			return -1
+		} else if a.(int32) == b.(int32) {
+			return 0
+		} else {
+			return 1
+		}
+	case int16:
+		if a.(int16) > b.(int16) {
+			return -1
+		} else if a.(int16) == b.(int16) {
+			return 0
+		} else {
+			return 1
+		}
+	case int8:
+		if a.(int8) > b.(int8) {
+			return -1
+		} else if a.(int8) == b.(int8) {
+			return 0
+		} else {
+			return 1
+		}
+	case float64:
+		if a.(float64) > b.(float64) {
+			return -1
+		} else if a.(float64) == b.(float64) {
+			return 0
+		} else {
+			return 1
+		}
+	case float32:
+		if a.(float32) > b.(float32) {
+			return -1
+		} else if a.(float32) == b.(float32) {
+			return 0
+		} else {
+			return 1
+		}
+	case bool:
+		if a.(bool) == b.(bool) {
+			return 0
+		} else {
+			return -1
+		}
+	case string:
+		if a.(string) > b.(string) {
+			return -1
+		} else if a.(string) == b.(string) {
+			return 0
+		} else {
+			return 1
+		}
+	default:
+		return 0
+	}
 }
 
 func NewLess() *Less {

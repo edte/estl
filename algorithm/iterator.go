@@ -44,13 +44,47 @@ func Distance(first, last iterator.Iterator) int {
 // Begin iterator to beginning
 // Returns an iterator pointing to the first element in the sequence:
 func Begin(container containers.Container) iterator.Iterator {
-	return container.Begin()
+	switch container.(type) {
+	case containers.Vector:
+		return container.(containers.Vector).Begin()
+	case containers.List:
+		return container.(containers.List).Begin()
+	case containers.ForwardList:
+		return container.(containers.ForwardList).Begin()
+	case containers.Deque:
+		return container.(containers.Deque).Begin()
+	case containers.String:
+		return container.(containers.String).Begin()
+	case containers.AssociativeContainer:
+		return container.(containers.AssociativeContainer).Begin()
+	case containers.UnorderedAssociativeContainer:
+		return container.(containers.UnorderedAssociativeContainer).Begin()
+	default:
+		return nil
+	}
 }
 
 // End iterator to End
 // Returns an iterator pointing to the past-the-end element in the sequence:
 func End(container containers.Container) iterator.Iterator {
-	return container.End()
+	switch container.(type) {
+	case containers.Vector:
+		return container.(containers.Vector).End()
+	case containers.List:
+		return container.(containers.List).End()
+	case containers.ForwardList:
+		return container.(containers.ForwardList).End()
+	case containers.Deque:
+		return container.(containers.Deque).End()
+	case containers.String:
+		return container.(containers.String).End()
+	case containers.AssociativeContainer:
+		return container.(containers.AssociativeContainer).End()
+	case containers.UnorderedAssociativeContainer:
+		return container.(containers.UnorderedAssociativeContainer).End()
+	default:
+		return nil
+	}
 }
 
 func Pre(it iterator.Iterator) iterator.RandomAccessIterator {

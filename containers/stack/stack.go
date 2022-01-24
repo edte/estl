@@ -8,7 +8,7 @@ package stack
 import (
 	"stl/allocator"
 	"stl/containers"
-	"stl/containers/deque"
+	"stl/containers/vector"
 	"stl/locker"
 )
 
@@ -21,7 +21,7 @@ type Stack struct {
 
 func New(opts ...Option) *Stack {
 	s := &Stack{
-		container: deque.New(),
+		container: vector.New(),
 	}
 
 	for _, opt := range opts {

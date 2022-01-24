@@ -31,3 +31,11 @@ func Stof() {
 func Stod() {
 
 }
+
+func kmp() {
+
+}
+
+func manacher() {
+
+}

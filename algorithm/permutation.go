@@ -39,16 +39,40 @@ func LexicographicalCompare(first1, last1, first2, last2 iterator.InputIterator,
 // rearranges the elements in the range [first,last) into the next
 // lexicographically greater permutation.
 func NextPermutation(first, last iterator.BidirectionalIterator, cmp ...comparator.Comparator) bool {
-	//cmp := comparator.Default(cmp...)
+	c := comparator.Default(cmp...)
+
+	var partitionNum iterator.BidirectionalIterator
+	var changeNum iterator.BidirectionalIterator
+
+	for i := Pre(last); !i.IsFrontEqual(first); i.Pre() {
+		if c.Operator(i.Value(), Pre(i).Value()) {
+			partitionNum = Pre(i)
+			break
+		}
+	}
+
+	if partitionNum == nil {
+		Reverse(first, last)
+		return false
+	}
+
+	for i := Pre(last); !i.IsFrontEqual(partitionNum); i.Pre() {
+		if c.Operator(i.Value(), partitionNum.Value()) {
+			changeNum = i
+			break
+		}
+	}
+
+	Swap(partitionNum, changeNum)
+
+	Reverse(Next(partitionNum), last)
 
 	return true
 }
 
 // PrePermutation transform range to previous permutation
 func PrePermutation(first, last iterator.BidirectionalIterator, cmp ...comparator.Comparator) bool {
-	//cmp := comparator.Default(cmp...)
-
-	return true
+	return NextPermutation(first, last, comparator.NewLess())
 }
 
 // IsPermutation test whether range is permutation of another
